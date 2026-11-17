@@ -266,19 +266,98 @@ body.meme-focus-mode {
   backdrop-filter: blur(8px);
 }
 
-/* Zen Mode Transition */
-.zen-active header,
-.zen-active #rank-section,
-.zen-active #quests-section,
-.zen-active #shop-section,
-.zen-active #stats-section,
-.zen-active footer {
+/* Keep Zen content in normal document flow so music never covers the timer. */
+.zen-active > header,
+.zen-active > footer,
+.zen-active main > :not(#tab-timer) {
   display: none !important;
 }
 
-.zen-active main {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
+.zen-exit {
+  display: none;
+}
+
+body.zen-active {
+  display: grid;
+  grid-template-columns: minmax(0, 56rem) minmax(0, 20rem);
+  gap: 1.5rem;
+  align-content: center;
   justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 4.5rem 1.5rem 1.5rem;
+}
+
+.zen-active main {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.zen-active #timer-toolbar,
+.zen-active #timer-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.zen-active #timer-toolbar > div {
+  flex-wrap: wrap;
+  justify-content: center;
+  min-width: 0;
+}
+
+.zen-active #timer-panel {
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.zen-active #timer-container {
+  flex-shrink: 0;
+  width: min(20rem, 100%);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.zen-active #lofi-widget {
+  position: static;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  z-index: auto;
+}
+
+.zen-active #lofi-expanded {
+  width: 100%;
+  max-width: 100%;
+}
+
+.zen-active .zen-exit {
+  display: inline-flex;
+  position: fixed;
+  top: 1rem;
+  right: 1.5rem;
+  z-index: 50;
+}
+
+@media (max-width: 1099px) {
+  body.zen-active {
+    display: block;
+    padding: 4.5rem 1rem 1.5rem;
+  }
+
+  .zen-active main {
+    max-width: 56rem;
+    margin: 0 auto;
+  }
+
+  .zen-active #lofi-widget {
+    max-width: 24rem;
+    margin: 1.5rem auto 0;
+  }
 }

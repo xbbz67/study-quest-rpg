@@ -1379,12 +1379,25 @@ function resetAllData() {
 }
 
 // Toggle Zen Mode
+let tabBeforeZen = 'tab-timer';
 function toggleZenMode() {
+  const entering = !document.body.classList.contains('zen-active');
+  if (entering) {
+    tabBeforeZen = Array.from(document.querySelectorAll('[id^="tab-"]')).find(tab => !tab.classList.contains('hidden'))?.id || 'tab-timer';
+    switchTab('tab-timer');
+  }
   document.body.classList.toggle('zen-active');
   const isZen = document.body.classList.contains('zen-active');
   const zenBtn = document.getElementById('btn-zen-mode');
   if (zenBtn) {
     zenBtn.innerText = isZen ? 'Thoát Zen Mode (Esc)' : '🧘 Zen Mode';
+    zenBtn.setAttribute('aria-pressed', String(isZen));
+  }
+  if (isZen) {
+    document.getElementById('btn-zen-exit')?.focus({ preventScroll: true });
+  } else {
+    switchTab(tabBeforeZen);
+    zenBtn?.focus({ preventScroll: true });
   }
 }
 

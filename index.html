@@ -261,7 +261,7 @@
     <div id="tab-timer" class="space-y-6">
       
       <!-- Mode selection & Ambient Sound bar -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+      <div id="timer-toolbar" class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
         
         <!-- Timer Modes -->
         <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
@@ -293,7 +293,7 @@
       </div>
 
       <!-- Huge Timer Display & Circular Ring -->
-      <div class="rpg-card rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center">
+      <div id="timer-panel" class="rpg-card rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center">
         
         <div id="timer-container" class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center mb-6 transition-all duration-300">
           
@@ -346,7 +346,7 @@
         </div>
 
         <!-- Control Action Buttons -->
-        <div class="flex items-center gap-4">
+        <div id="timer-actions" class="flex items-center gap-4">
           <button id="btn-timer-start" onclick="startTimer()" class="rpg-btn px-8 py-3.5 rounded-2xl text-base font-extrabold tracking-wide uppercase bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white shadow-xl shadow-indigo-600/40 flex items-center gap-2">
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             Bắt Đầu Cày Cấp
@@ -681,6 +681,10 @@
     </div>
 
   </div>
+
+  <button id="btn-zen-exit" onclick="toggleZenMode()" class="zen-exit items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-600 text-slate-200 text-xs font-bold shadow-lg hover:border-indigo-400" aria-label="Thoát chế độ Zen">
+    ✕ Thoát Zen <span class="text-slate-400">(Esc)</span>
+  </button>
 
   <!-- Scripts -->
   <script src="app.js"></script>

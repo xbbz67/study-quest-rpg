@@ -1,0 +1,6 @@
+.git/
+.env*
+node_modules/
+assets/.tools/
+assets/study-quest-rpg-*.zip
+supabase/

@@ -1,0 +1,1 @@
+window.STUDY_CLOUD_CONFIG = {"key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdHl5bGpwZ3JtdHdxZmp3dHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5MjY3NTUsImV4cCI6MjExMDUwMjc1NX0.tqmxMOQh9po9qBTnGjnoHeZoXFJ-oC4wHDh1K0ofmwM","url":"https://qatyyljpgrmtwqfjwtqn.supabase.co"};

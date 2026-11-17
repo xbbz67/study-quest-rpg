@@ -1,3 +1,15 @@
+## Tài khoản và đồng bộ cloud
+
+Bản triển khai dùng Supabase Auth (email/mật khẩu) và bảng `study_progress` để giữ tiến độ trên nhiều máy. Chọn **Đăng nhập** trên website; tài khoản mới sẽ được hỏi trước khi chuyển tiến độ local lên cloud. Tài khoản đã có dữ liệu sẽ tải bản cloud. Tiến độ khách và từng tài khoản được lưu riêng trên máy.
+
+- Frontend: `assets/cloud-save.js`; cấu hình công khai: `assets/cloud-config.js`.
+- Schema và quyền truy cập: `supabase/migrations/20261117160000_cloud_progress.sql`. Bật RLS; chỉ chủ tài khoản đọc tiến độ. Hàm lưu kiểm tra danh tính và phiên bản để tránh hai máy ghi đè nhau.
+- Khi mất mạng, thay đổi được giữ trong cache riêng của tài khoản và thử đồng bộ lại. Nếu có xung đột, có thể xuất bản trên máy rồi tải bản cloud; bản local trước khi thay thế vẫn được giữ dự phòng.
+- Chỉ khóa anon/publishable được đưa vào frontend. Không đưa access token, mật khẩu database hoặc khóa service role lên GitHub.
+- Supabase bật xác nhận email. SMTP mặc định chỉ gửi cho email thành viên tổ chức và có giới hạn gửi. Muốn mở đăng ký cho mọi email, cấu hình SMTP riêng tại Supabase Dashboard → Authentication → Email. Không tắt xác nhận email để bỏ qua giới hạn này.
+- Site URL / redirect URL: `https://study-quest-rpg-beige.vercel.app/`.
+- SDK vendored: `@supabase/supabase-js` 2.119.0; giấy phép đi kèm `assets/supabase.LICENSE.txt`.
+
 # ⚔️ STUDY RPG - HỆ THỐNG CÀY CẤP & LEO RANK HỌC TẬP
 
 > **Biến từng phút học tập thành kinh nghiệm (EXP), vàng và điểm danh vọng để thăng hạng từ Đồng Đoàn lên Global Elite!**

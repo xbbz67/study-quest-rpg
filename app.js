@@ -293,11 +293,12 @@ const sounds = new SoundManager();
 // 3. GAME STATE MANAGEMENT & STORAGE
 // ==========================================
 
-let state = { ...DEFAULT_STATE };
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let activeStorageKey = STORAGE_KEY;
 
 function loadGameState() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(activeStorageKey);
     if (saved) {
       const parsed = JSON.parse(saved);
       state = { ...DEFAULT_STATE, ...parsed };
@@ -313,7 +314,7 @@ function loadGameState() {
     }
   } catch (err) {
     console.error("Lỗi khi tải dữ liệu LocalStorage:", err);
-    state = { ...DEFAULT_STATE };
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
   }
   ensureDailyQuests();
   saveGameState();
@@ -321,8 +322,9 @@ function loadGameState() {
 
 function saveGameState() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(activeStorageKey, JSON.stringify(state));
     showSaveIndicator();
+    window.CloudSave?.queueSave();
   } catch (err) {
     console.error("Không thể lưu LocalStorage:", err);
   }
@@ -1371,8 +1373,9 @@ function importData() {
 
 function resetAllData() {
   if (confirm("⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa toàn bộ tiến trình, Level, Vàng và Nhiệm vụ để bắt đầu lại từ đầu không?")) {
-    localStorage.removeItem(STORAGE_KEY);
-    state = { ...DEFAULT_STATE };
+    localStorage.removeItem(activeStorageKey);
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    ensureDailyQuests();
     saveGameState();
     location.reload();
   }
@@ -1496,6 +1499,31 @@ window.addEventListener('DOMContentLoaded', () => {
     checkBuffExpiration();
     renderHUD();
   }, 30000);
+
+  window.CloudSave?.init({
+    snapshot: () => state,
+    pause: () => { if (timerState === 'RUNNING') pauseTimer(); },
+    apply: (payload, storageKey) => {
+      if (payload && (!Number.isFinite(payload.level) || !Array.isArray(payload.quests) || !payload.character)) throw new Error('Invalid cloud save');
+      if (timerState === 'RUNNING') pauseTimer();
+      resetTimer();
+      const defaults = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      activeStorageKey = storageKey;
+      state = { ...defaults, ...(payload || {}) };
+      state.character = { ...defaults.character, ...(payload?.character || {}) };
+      state.settings = { ...defaults.settings, ...(payload?.settings || {}) };
+      ensureDailyQuests();
+      checkDailyStreak();
+      checkBuffExpiration();
+      saveGameState();
+      renderHUD(); renderQuests(); renderShop(); renderRankMilestones();
+    }
+  }).catch(error => {
+    console.error('Cloud initialization failed:', error);
+    document.querySelector('main').inert = false;
+    const indicator = document.getElementById('cloud-status');
+    if (indicator) indicator.textContent = 'Cloud chưa kết nối · dữ liệu vẫn trên máy';
+  });
 });
 
 // ==========================================

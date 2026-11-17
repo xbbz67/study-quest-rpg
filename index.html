@@ -39,7 +39,7 @@
        TOP NAVIGATION BAR
        =================================================== -->
   <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
       <!-- Brand Logo -->
       <div class="flex items-center gap-3">
@@ -62,12 +62,16 @@
       </div>
 
       <!-- Quick Resources & Controls -->
-      <div class="flex items-center gap-2.5 lg:gap-4">
+      <div class="flex flex-wrap justify-end items-center gap-2.5 lg:gap-4">
+        <div class="flex flex-col items-end gap-1">
+          <button id="cloud-account-button" class="px-3 py-1.5 rounded-xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-200 text-xs font-bold">☁ Đăng nhập</button>
+          <span id="cloud-status" role="status" class="text-[10px] text-slate-400">Chỉ lưu trên máy</span>
+        </div>
         
         <!-- Auto-save notification pill -->
         <div id="save-indicator" class="opacity-0 transition-opacity duration-300 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
           <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-          <span class="hidden md:inline">Đã lưu tiến độ</span>
+          <span class="hidden md:inline">Đã lưu trên máy</span>
         </div>
 
         <!-- Gold Counter -->
@@ -686,7 +690,47 @@
     ✕ Thoát Zen <span class="text-slate-400">(Esc)</span>
   </button>
 
+  <dialog id="cloud-dialog" aria-labelledby="cloud-title">
+    <div class="flex items-center justify-between gap-3 mb-2">
+      <h2 id="cloud-title" class="font-bold text-lg">☁ Tài khoản Study RPG</h2>
+      <button id="cloud-close" type="button" aria-label="Đóng" class="p-2 text-slate-400 hover:text-white">✕</button>
+    </div>
+    <p class="text-xs text-slate-400 mb-5">Mang tiến độ học tập của bạn sang mọi máy.</p>
+    <form id="cloud-auth-form" class="space-y-4">
+      <div><label for="cloud-email" class="block text-xs mb-2">Email</label><input id="cloud-email" type="email" autocomplete="email" required class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-sm" placeholder="ban@example.com"></div>
+      <div><label for="cloud-password" class="block text-xs mb-2">Mật khẩu</label><input id="cloud-password" type="password" autocomplete="current-password" minlength="8" required class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-sm" placeholder="Tối thiểu 8 ký tự"></div>
+      <button id="cloud-login" type="submit" class="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 p-3 text-sm font-bold disabled:opacity-50">Đăng nhập</button>
+      <button id="cloud-signup" type="button" class="w-full rounded-xl border border-slate-600 hover:border-indigo-400 p-3 text-sm font-bold disabled:opacity-50">Tạo tài khoản mới</button>
+      <button id="cloud-forgot" type="button" class="text-xs text-indigo-300">Quên mật khẩu?</button>
+      <p class="text-xs text-slate-500">Chưa đăng nhập vẫn có thể học; tiến độ khi đó chỉ lưu trong trình duyệt này.</p>
+    </form>
+    <section id="cloud-account" hidden>
+      <p id="cloud-email-label" class="text-sm font-semibold break-all mb-2"></p>
+      <p id="cloud-account-status" class="text-xs text-slate-400 mb-5" role="status"></p>
+      <div class="flex flex-wrap gap-2">
+        <button id="cloud-sync" type="button" class="rounded-xl bg-indigo-600 p-3 text-xs font-bold">Đồng bộ ngay</button>
+        <button id="cloud-logout" type="button" class="rounded-xl border border-slate-600 p-3 text-xs">Đăng xuất</button>
+      </div>
+    </section>
+    <form id="cloud-recovery" hidden class="space-y-4">
+      <label for="cloud-new-password" class="block text-sm">Mật khẩu mới</label>
+      <input id="cloud-new-password" type="password" autocomplete="new-password" minlength="8" required class="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-sm">
+      <button type="submit" class="w-full rounded-xl bg-indigo-600 p-3 text-sm font-bold">Lưu mật khẩu mới</button>
+    </form>
+    <section id="cloud-conflict" hidden class="mt-5 rounded-xl border border-amber-500/40 p-3">
+      <p class="text-xs text-amber-200 mb-3">Có tiến độ mới từ thiết bị khác. Bản trên máy được giữ dự phòng trước khi thay thế.</p>
+      <div class="flex flex-wrap gap-2">
+        <button id="cloud-download" type="button" class="rounded-lg border border-slate-600 px-3 py-2 text-xs">Xuất bản trên máy</button>
+        <button id="cloud-use-remote" type="button" class="rounded-lg bg-indigo-600 px-3 py-2 text-xs">Dùng tiến độ cloud</button>
+      </div>
+    </section>
+    <p id="cloud-message" role="status" class="text-xs leading-relaxed text-amber-200 mt-4"></p>
+  </dialog>
+
   <!-- Scripts -->
+  <script src="assets/supabase.js"></script>
+  <script src="assets/cloud-config.js"></script>
+  <script src="assets/cloud-save.js"></script>
   <script src="app.js"></script>
   <script>
     function openAddQuestModal() {

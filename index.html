@@ -395,7 +395,7 @@
         <!-- Action Buttons -->
         <div class="flex items-center gap-2">
           <button onclick="resetAllQuests()" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center gap-1.5">
-            <span>🔄</span> Làm Mới Ngày
+            <span>🔄</span> Cập Nhật Hôm Nay
           </button>
           <button onclick="openAddQuestModal()" class="rpg-btn px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
             <span>➕</span> Thêm Nhiệm Vụ Mới
@@ -404,21 +404,9 @@
 
       </div>
 
-      <!-- Quick Add Template Suggestions -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 text-xs no-scrollbar">
-        <span class="text-slate-500 font-semibold flex-shrink-0">Gợi ý nhanh:</span>
-        <button onclick="addCustomQuest('Giải 5 bài tập Toán Hình & Giải Tích', 'Toán', 'medium')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
-          📐 Giải bài Toán (+160 EXP)
-        </button>
-        <button onclick="addCustomQuest('Học & Thuộc 30 từ vựng Sinh học 12', 'Sinh học', 'medium')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
-          🧬 Từ vựng Sinh học (+160 EXP)
-        </button>
-        <button onclick="addCustomQuest('Luyện 1 Đề Thi Thử Tốt Nghiệp', 'Luyện thi', 'hard')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
-          📝 Giải 1 đề thi thử (+300 EXP)
-        </button>
-        <button onclick="addCustomQuest('Đọc 20 trang sách chuyên ngành', 'Đọc sách', 'easy')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
-          📖 Đọc sách 20 trang (+80 EXP)
-        </button>
+      <div class="rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-4 py-3 text-xs text-slate-400 leading-relaxed">
+        <p class="font-semibold text-indigo-300 mb-1">⏱️ Biến từng phút tập trung thành chiến tích</p>
+        <p>Chạy timer để tự động tích tiến độ và nhận EXP, vàng khi đạt mục tiêu. Thử thách làm mới mỗi ngày theo giờ trên máy; thời gian nghỉ không tính vào tiến độ.</p>
       </div>
 
       <!-- Dynamic Quests List -->
@@ -586,13 +574,13 @@
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Tên mục tiêu / Nhiệm vụ:</label>
-          <input id="input-quest-title" type="text" placeholder="VD: Giải 10 bài tập Toán Tích Phân, Học 20 từ vựng Sinh học..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+            <input id="input-quest-title" type="text" placeholder="VD: Dọn góc học tập, viết kế hoạch trước khi bật timer..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Môn học / Chủ đề:</label>
-            <input id="input-quest-cat" type="text" placeholder="VD: Toán, Sinh, Anh, Lý..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Chủ đề:</label>
+              <input id="input-quest-cat" type="text" placeholder="VD: Thói quen, Chuẩn bị, Cá nhân..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Độ khó thử thách:</label>

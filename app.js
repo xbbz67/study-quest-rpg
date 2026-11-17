@@ -53,48 +53,7 @@ const DEFAULT_STATE = {
   activeBuff: null, // { type: 'exp_2x', expiresAt: timestamp }
   inventory: [],
   purchasedItems: [],
-  quests: [
-    {
-      id: 'q1',
-      title: 'Giải 5 bài tập Toán Hình & Giải Tích',
-      category: 'Toán',
-      difficulty: 'medium',
-      exp: 150,
-      gold: 40,
-      completed: false,
-      isDaily: true
-    },
-    {
-      id: 'q2',
-      title: 'Học & Ôn 30 từ vựng Sinh học / Di truyền',
-      category: 'Sinh học',
-      difficulty: 'easy',
-      exp: 80,
-      gold: 25,
-      completed: false,
-      isDaily: true
-    },
-    {
-      id: 'q3',
-      title: 'Hoàn thành 2 phiên Pomodoro 25 phút',
-      category: 'Tập trung',
-      difficulty: 'medium',
-      exp: 150,
-      gold: 50,
-      completed: false,
-      isDaily: true
-    },
-    {
-      id: 'q4',
-      title: 'Boss Quest: Đọc xong 1 chương sách chuyên ngành',
-      category: 'Khoa học',
-      difficulty: 'boss',
-      exp: 500,
-      gold: 150,
-      completed: false,
-      isDaily: true
-    }
-  ],
+  quests: [],
   logs: [
     { time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), text: "Ân oán giang hồ nuôi tao lớn - ĐHQG Hà Nội dạy tao khôn! Bắt đầu cày cấp ngay!" }
   ],
@@ -356,6 +315,8 @@ function loadGameState() {
     console.error("Lỗi khi tải dữ liệu LocalStorage:", err);
     state = { ...DEFAULT_STATE };
   }
+  ensureDailyQuests();
+  saveGameState();
 }
 
 function saveGameState() {
@@ -529,6 +490,7 @@ let totalSessionSeconds = 25 * 60;
 let stopwatchSeconds = 0;
 let timerInterval = null;
 let secondsAccumulator = 0; // Tracks every 60s of active study for real-time EXP/Gold
+let isBreakSession = false;
 
 function setTimerMode(modeKey, customMinutes = null) {
   if (timerState === 'RUNNING') {
@@ -540,6 +502,7 @@ function setTimerMode(modeKey, customMinutes = null) {
   clearInterval(timerInterval);
   timerState = 'IDLE';
   currentTimerMode = modeKey;
+  isBreakSession = false;
 
   const mode = TIMER_MODES[modeKey];
   if (modeKey === 'CUSTOM' && customMinutes) {
@@ -566,6 +529,7 @@ function startTimer() {
   if (timerState === 'RUNNING') return;
 
   sounds.init();
+  if (timerState === 'BREAK') isBreakSession = true;
   timerState = 'RUNNING';
 
   // If ambient sound is selected, play it
@@ -587,7 +551,7 @@ function startTimer() {
   }, 1000);
 
   updateTimerUI();
-  addLog(`⏱️ Bắt đầu phiên học: ${TIMER_MODES[currentTimerMode].label}`);
+  addLog(isBreakSession ? '☕ Bắt đầu giờ nghỉ giải lao.' : `⏱️ Bắt đầu phiên học: ${TIMER_MODES[currentTimerMode].label}`);
 }
 
 function pauseTimer() {
@@ -604,6 +568,7 @@ function resetTimer() {
   clearInterval(timerInterval);
   sounds.stopAmbient();
   timerState = 'IDLE';
+  isBreakSession = false;
 
   if (currentTimerMode === 'STOPWATCH') {
     stopwatchSeconds = 0;
@@ -617,6 +582,17 @@ function resetTimer() {
 }
 
 function tickTimer() {
+  if (timerState !== 'RUNNING') return;
+  if (isBreakSession) {
+    timeRemaining = Math.max(0, timeRemaining - 1);
+    updateTimerUI();
+    if (timeRemaining === 0) onTimerCompleted();
+    return;
+  }
+  const newDay = ensureDailyQuests();
+  state.dailyFocus.focusSeconds += 1;
+  if (currentTimerMode === 'STOPWATCH') state.dailyFocus.stopwatchSeconds += 1;
+  if (newDay) renderQuests();
   secondsAccumulator++;
 
   // Every 60 seconds of focused study gives +10 EXP and +2 Gold
@@ -644,10 +620,8 @@ function tickTimer() {
   if (timeRemaining > 0) {
     timeRemaining--;
     updateTimerUI();
-  } else {
-    // Session completed!
-    onTimerCompleted();
   }
+  if (timeRemaining === 0) onTimerCompleted();
 }
 
 function onTimerCompleted() {
@@ -655,10 +629,15 @@ function onTimerCompleted() {
   sounds.stopAmbient();
   sounds.playAlarm();
 
-  if (timerState === 'RUNNING') {
+  if (timerState === 'RUNNING' && !isBreakSession) {
     // Finished focus block
     const mode = TIMER_MODES[currentTimerMode];
     state.pomodoroCompleted += 1;
+    ensureDailyQuests();
+    if (currentTimerMode === 'POMODORO') state.dailyFocus.pomodoros += 1;
+    if (currentTimerMode === 'DEEP_WORK') state.dailyFocus.deepWork += 1;
+    if (currentTimerMode === 'CUSTOM' && mode.focusMinutes >= 15) state.dailyFocus.customSessions += 1;
+    checkFocusQuests();
 
     // Additional pet coffee bonus
     let bonusGold = mode.goldReward;
@@ -686,9 +665,10 @@ function onTimerCompleted() {
     updateTimerUI();
 
     alert(`🎉 XUẤT SẮC! Bạn đã hoàn thành phiên học ${mode.label}.\nNhận ngay +${mode.expReward} EXP và +${bonusGold} Vàng!\nHãy nghỉ ngơi thư giãn ${mode.breakMinutes} phút nào!`);
-  } else if (timerState === 'BREAK') {
+  } else if (timerState === 'BREAK' || isBreakSession) {
     // Finished break
     timerState = 'IDLE';
+    isBreakSession = false;
     timeRemaining = TIMER_MODES[currentTimerMode].focusMinutes * 60;
     totalSessionSeconds = timeRemaining;
     updateTimerUI();
@@ -732,15 +712,15 @@ function updateTimerUI() {
   if (timerDisplay) {
     timerDisplay.innerText = formattedTime;
   }
-  document.title = timerState === 'RUNNING' ? `(${formattedTime}) Đang cày cấp... | Study RPG` : `Study RPG - Cày Cấp Học Tập`;
+  document.title = timerState === 'RUNNING' ? `(${formattedTime}) ${isBreakSession ? 'Đang nghỉ' : 'Đang cày cấp'}... | Study RPG` : `Study RPG - Cày Cấp Học Tập`;
 
   // Status text and glow
   if (timerStatus) {
-    if (timerState === 'RUNNING') {
+    if (timerState === 'RUNNING' && !isBreakSession) {
       timerStatus.innerText = '🔥 ĐANG TẬP TRUNG HỌC TẬP';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-amber-400 animate-pulse';
       timerContainer?.classList.add('timer-active-glow');
-    } else if (timerState === 'BREAK') {
+    } else if (timerState === 'BREAK' || (timerState === 'RUNNING' && isBreakSession)) {
       timerStatus.innerText = '☕ ĐANG GIẢI LAO THƯ GIÃN';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-emerald-400 animate-pulse';
       timerContainer?.classList.remove('timer-active-glow');
@@ -784,7 +764,43 @@ function updateTimerModeButtons() {
 
 let questFilter = 'all'; // 'all', 'active', 'completed'
 
+const TIMER_QUESTS = [
+  { key: 'warmup', title: 'Khởi động: tập trung đủ 10 phút', metric: 'focusSeconds', target: 600, unit: 'phút', difficulty: 'easy', exp: 60, gold: 15 },
+  { key: 'rhythm', title: 'Vào guồng: tích lũy 30 phút tập trung', metric: 'focusSeconds', target: 1800, unit: 'phút', difficulty: 'medium', exp: 120, gold: 35 },
+  { key: 'pomodoro', title: 'Hoàn thành 2 phiên Pomodoro 25 phút', metric: 'pomodoros', target: 2, unit: 'phiên', difficulty: 'medium', exp: 150, gold: 50 },
+  { key: 'deep', title: 'Lặn sâu: hoàn thành 1 phiên Deep Work 50 phút', metric: 'deepWork', target: 1, unit: 'phiên', difficulty: 'hard', exp: 220, gold: 65 },
+  { key: 'custom', title: 'Nhịp riêng: hoàn thành 1 phiên tùy chỉnh từ 15 phút', metric: 'customSessions', target: 1, unit: 'phiên', difficulty: 'easy', exp: 80, gold: 20 },
+  { key: 'free', title: 'Tự do tập trung: bấm giờ đủ 15 phút', metric: 'stopwatchSeconds', target: 900, unit: 'phút', difficulty: 'easy', exp: 80, gold: 25 },
+  { key: 'boss', title: 'Boss: chinh phục 90 phút tập trung trong ngày', metric: 'focusSeconds', target: 5400, unit: 'phút', difficulty: 'boss', exp: 400, gold: 120 }
+];
+
+function getQuestDay() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function ensureDailyQuests() {
+  const day = getQuestDay();
+  if (state.dailyFocus?.date === day && state.dailyFocus.version === 1) return false;
+  state.dailyFocus = { date: day, version: 1, focusSeconds: 0, stopwatchSeconds: 0, pomodoros: 0, deepWork: 0, customSessions: 0 };
+  const customQuests = state.quests.filter(q => !q.timerGoal && !(q.isDaily && ['q1', 'q2', 'q3', 'q4'].includes(q.id)));
+  state.quests = [...customQuests, ...TIMER_QUESTS.map(goal => ({
+    id: `daily_${day}_${goal.key}`, title: goal.title, category: 'Tập trung',
+    difficulty: goal.difficulty, exp: goal.exp, gold: goal.gold,
+    completed: false, isDaily: true, timerGoal: { ...goal }
+  }))];
+  return true;
+}
+
+function timerQuestProgress(quest) {
+  const goal = quest.timerGoal;
+  const value = Math.min(state.dailyFocus[goal.metric] || 0, goal.target);
+  const divisor = goal.unit === 'phút' ? 60 : 1;
+  return { current: Math.floor(value / divisor), target: goal.target / divisor, percent: Math.floor(value / goal.target * 100) };
+}
+
 function renderQuests() {
+  if (ensureDailyQuests()) saveGameState();
   const container = document.getElementById('quests-list');
   if (!container) return;
 
@@ -814,10 +830,11 @@ function renderQuests() {
 
   container.innerHTML = filtered.map(quest => {
     const badge = difficultyBadges[quest.difficulty] || difficultyBadges.easy;
+    const progress = quest.timerGoal ? timerQuestProgress(quest) : null;
     return `
       <div class="quest-item group p-4 rounded-xl bg-slate-800/40 hover:bg-slate-800/80 border ${quest.completed ? 'border-emerald-500/30 bg-emerald-950/10' : 'border-slate-700/60'} transition-all flex items-center justify-between gap-4">
         <div class="flex items-start gap-3.5 flex-1 min-w-0">
-          <button onclick="toggleQuest('${quest.id}', event)" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${quest.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30' : 'border-slate-600 hover:border-indigo-400 bg-slate-900/50'}">
+          <button ${quest.timerGoal ? 'disabled title="Tự động hoàn thành khi đạt mục tiêu timer"' : `onclick="toggleQuest('${quest.id}', event)"`} aria-label="${quest.completed ? 'Đã hoàn thành' : 'Hoàn thành nhiệm vụ'}" class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${quest.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30' : 'border-slate-600 hover:border-indigo-400 bg-slate-900/50'}">
             ${quest.completed ? '<svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>' : ''}
           </button>
           <div class="min-w-0 flex-1">
@@ -829,9 +846,11 @@ function renderQuests() {
                 ${escapeHtml(quest.category || 'Mục tiêu')}
               </span>
             </div>
-            <h4 class="text-sm font-semibold truncate ${quest.completed ? 'line-through text-slate-500' : 'text-slate-200'}">
+            <h4 class="text-sm font-semibold ${quest.completed ? 'line-through text-slate-500' : 'text-slate-200'}">
               ${escapeHtml(quest.title)}
             </h4>
+            ${progress ? `<p class="text-xs text-slate-400 mt-1">${progress.current}/${progress.target} ${quest.timerGoal.unit} · ${quest.completed ? 'Đã nhận thưởng' : 'Tự động ghi nhận từ timer'}</p>
+            <div class="h-1.5 mt-2 rounded-full bg-slate-700/60 overflow-hidden" role="progressbar" aria-label="Tiến độ nhiệm vụ" aria-valuenow="${progress.current}" aria-valuemin="0" aria-valuemax="${progress.target}"><div class="h-full rounded-full ${quest.completed ? 'bg-emerald-400' : 'bg-indigo-400'} transition-all" style="width:${progress.percent}%"></div></div>` : ''}
           </div>
         </div>
 
@@ -844,7 +863,7 @@ function renderQuests() {
               <span>+${quest.gold}</span> <span class="text-[10px]">🪙</span>
             </div>
           </div>
-          <button onclick="deleteQuest('${quest.id}')" title="Xóa nhiệm vụ" class="opacity-0 group-hover:opacity-100 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
+          <button ${quest.timerGoal ? 'hidden' : ''} onclick="deleteQuest('${quest.id}')" title="Xóa nhiệm vụ" class="opacity-0 group-hover:opacity-100 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
           </button>
         </div>
@@ -854,8 +873,9 @@ function renderQuests() {
 }
 
 function toggleQuest(id, event) {
+  if (ensureDailyQuests()) { saveGameState(); renderQuests(); }
   const quest = state.quests.find(q => q.id === id);
-  if (!quest) return;
+  if (!quest || quest.timerGoal) return;
 
   quest.completed = !quest.completed;
 
@@ -907,33 +927,31 @@ function addCustomQuest(title, category, difficulty) {
 }
 
 function deleteQuest(id) {
-  state.quests = state.quests.filter(q => q.id !== id);
+  state.quests = state.quests.filter(q => q.id !== id || q.timerGoal);
   saveGameState();
   renderQuests();
 }
 
 function resetAllQuests() {
-  if (!confirm("Bạn có muốn reset trạng thái của tất cả các nhiệm vụ về 'chưa hoàn thành' để cày lại hôm nay?")) {
-    return;
-  }
-  state.quests.forEach(q => q.completed = false);
+  ensureDailyQuests();
   saveGameState();
   renderQuests();
-  addLog(`🔄 Đã làm mới trạng thái tất cả nhiệm vụ hàng ngày!`);
+  addLog('🔄 Đã cập nhật nhiệm vụ hôm nay. Thử thách timer tự làm mới khi sang ngày mới.');
 }
 
 function checkFocusQuests() {
-  // Automatically check quest for 25m or focus time
-  if (state.totalMinutesStudied >= 50) {
-    const focusQuest = state.quests.find(q => q.category === 'Tập trung' && !q.completed);
-    if (focusQuest) {
-      focusQuest.completed = true;
+  ensureDailyQuests();
+  for (const quest of state.quests) {
+    if (quest.timerGoal && !quest.completed && state.dailyFocus[quest.timerGoal.metric] >= quest.timerGoal.target) {
+      quest.completed = true;
       sounds.playQuestDone();
-      addExp(focusQuest.exp, 'quest_auto');
-      addGold(focusQuest.gold);
-      addLog(`🎯 Tự động hoàn thành nhiệm vụ tập trung!`);
+      addExp(quest.exp, 'quest_auto');
+      addGold(quest.gold);
+      addLog(`🎯 Hoàn thành: ${quest.title} (+${quest.exp} EXP, +${quest.gold} Vàng)!`);
     }
   }
+  saveGameState();
+  renderQuests();
 }
 
 // ==========================================
@@ -1461,6 +1479,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Auto check buff expiry every minute
   setInterval(() => {
+    if (ensureDailyQuests()) { saveGameState(); renderQuests(); }
     checkBuffExpiration();
     renderHUD();
   }, 30000);

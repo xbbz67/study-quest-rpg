@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study RPG - Hệ Thống Cày Cấp & Leo Rank Học Tập</title>
+
+  <link rel="icon" href="assets/avatar.png" sizes="600x600">
+  <link rel="apple-touch-icon" href="assets/avatar.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- ===================================================
+       TOP NAVIGATION BAR
+       =================================================== -->
+  <header class="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-400 p-[2px] shadow-lg shadow-indigo-500/20">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-xl">
+            ⚔️
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-black text-sm lg:text-base tracking-wider bg-gradient-to-r from-amber-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent">
+              STUDY RPG
+            </h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              v1.0
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Level Up Your Focus & Knowledge</p>
+        </div>
+      </div>
+
+      <!-- Quick Resources & Controls -->
+      <div class="flex items-center gap-2.5 lg:gap-4">
+        
+        <!-- Auto-save notification pill -->
+        <div id="save-indicator" class="opacity-0 transition-opacity duration-300 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+          <span class="hidden md:inline">Đã lưu tiến độ</span>
+        </div>
+
+        <!-- Gold Counter -->
+        <div class="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1 rounded-xl text-yellow-400 font-bold text-xs shadow-inner">
+          <span class="text-sm">🪙</span>
+          <span id="gold-count" class="font-mono">50</span>
+        </div>
+
+        <!-- Daily Streak Counter -->
+        <div class="flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl text-rose-400 font-bold text-xs shadow-inner" title="Chuỗi cày cấp liên tục">
+          <span>🔥</span>
+          <span id="streak-count" class="font-mono">1 ngày</span>
+        </div>
+
+        <!-- Active Buff Badge -->
+        <div id="active-buff-badge" class="hidden text-xs font-bold px-2.5 py-1 rounded-xl bg-amber-500 text-slate-950 animate-bounce">
+          ⚡ X2 EXP (30m)
+        </div>
+
+        <!-- Sound Toggle -->
+        <button id="sound-toggle-btn" title="Bật/Tắt âm thanh Web Audio" class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-300 text-xs font-bold transition-all">
+          🔊 Bật
+        </button>
+
+        <!-- Meme Wallpaper Toggle -->
+        <button id="btn-meme-bg" onclick="toggleMemeBg()" title="Bật/Tắt chế độ xem hình nền rõ" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 hover:border-amber-400 text-amber-300 text-xs font-bold transition-all">
+          <span>🖼️</span> <span class="hidden md:inline">Hình Nền</span>
+        </button>
+
+        <!-- Zen Mode Toggle -->
+        <button id="btn-zen-mode" onclick="toggleZenMode()" title="Chế độ Zen không xao nhãng" class="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-indigo-500 text-slate-300 text-xs font-bold transition-all">
+          🧘 Zen Mode
+        </button>
+
+        <!-- Data Backup Menu -->
+        <div class="relative group">
+          <button class="p-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-300 text-xs transition-all">
+            ⚙️
+          </button>
+          <div class="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-2 hidden group-hover:block z-50">
+            <button onclick="promptEditProfile()" class="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 rounded-lg">
+              ✏️ Sửa Tên & Avatar
+            </button>
+            <button onclick="exportData()" class="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 rounded-lg">
+              💾 Sao Lưu Dữ Liệu (JSON)
+            </button>
+            <button onclick="importData()" class="w-full text-left px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 rounded-lg">
+              📥 Khôi Phục Dữ Liệu
+            </button>
+            <div class="border-t border-slate-800 my-1"></div>
+            <button onclick="resetAllData()" class="w-full text-left px-3 py-2 text-xs font-medium text-rose-400 hover:bg-rose-950/40 rounded-lg">
+              ⚠️ Đặt Lại Từ Đầu
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================
+       MAIN CONTAINER
+       =================================================== -->
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full flex-1">
+    
+    <!-- ===============================================
+         HERO CHARACTER HUD (PLAYER PROFILE & PROGRESSION)
+         =============================================== -->
+    <section class="rpg-card rounded-2xl p-5 lg:p-6 mb-6 relative overflow-hidden">
+      <!-- Glow background decoration -->
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- VNU Giang Ho Meme Slogan Banner -->
+      <div class="mb-5 p-3 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-rose-500/15 to-purple-600/20 border border-amber-500/40 flex items-center justify-between gap-3 flex-wrap shadow-inner relative z-10">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl animate-bounce">🔥</span>
+          <p class="font-display font-black text-xs sm:text-sm tracking-wider uppercase bg-gradient-to-r from-amber-300 via-rose-300 to-yellow-200 bg-clip-text text-transparent drop-shadow">
+            ÂN OÁN GIANG HỒ NUÔI TAO LỚN — ĐẠI HỌC QUỐC GIA HÀ NỘI DẠY TAO KHÔN
+          </p>
+        </div>
+        <span class="text-[10px] font-extrabold text-amber-400/90 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
+          📍 144 Xuân Thủy - Cầu Giấy
+        </span>
+      </div>
+
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
+        
+        <!-- Player Avatar & Identity -->
+        <div class="flex items-center gap-4 w-full lg:w-auto">
+          <div class="relative cursor-pointer" onclick="promptEditProfile()" title="Bấm để đổi Avatar & Tên">
+            <div id="char-avatar-container" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl bg-slate-900 border-2 border-amber-600/50 shadow-lg avatar-frame-bronze">
+              <img id="char-avatar" src="assets/avatar.png" alt="Avatar" class="w-full h-full object-cover rounded-2xl"/>
+            </div>
+            <!-- Pet companion badge -->
+            <div id="char-pet-badge" class="hidden absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-950 border border-slate-700 flex items-center justify-center text-xs shadow-md">
+              🦉
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="char-name" class="font-display font-black text-lg lg:text-xl text-white tracking-wide">
+                Chiến Thần VNU
+              </h2>
+              <button onclick="promptEditProfile()" class="text-slate-500 hover:text-slate-300 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span id="char-title" class="text-xs font-semibold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                Giang Hồ Học Thuật
+              </span>
+              <span class="text-xs text-slate-400">• Đã học: <strong id="total-minutes-count" class="text-slate-200">0p</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Rank Display -->
+        <div class="flex items-center gap-4 bg-slate-900/80 border border-slate-800 rounded-2xl px-5 py-3 shadow-inner w-full sm:w-auto justify-between sm:justify-start">
+          <div class="flex items-center gap-3">
+            <div id="rank-icon" class="text-3xl">🥉</div>
+            <div>
+              <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">BẬC DANH VỌNG</div>
+              <div id="rank-name" class="font-display font-black text-base text-amber-500 tracking-wider">
+                BRONZE
+              </div>
+              <div id="rank-subtext" class="text-[11px] text-slate-400">Đồng Đoàn</div>
+            </div>
+          </div>
+
+          <div class="text-right pl-4 border-l border-slate-800">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">CẤP ĐỘ HIỆN TẠI</div>
+            <div class="font-display font-black text-2xl text-indigo-400">
+              LV.<span id="level-number">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Level & EXP Progress Bar -->
+        <div class="w-full lg:w-96 flex flex-col gap-1.5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-bold text-indigo-300 flex items-center gap-1">
+              ⚡ TIẾN TRÌNH EXP
+            </span>
+            <div class="flex items-center gap-2">
+              <span id="exp-text" class="font-mono text-slate-300 font-semibold">0 / 100 EXP</span>
+              <span id="exp-percent-text" class="font-mono font-bold text-indigo-400">0%</span>
+            </div>
+          </div>
+          
+          <div class="relative w-full h-4 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+            <div id="exp-bar-fill" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 rounded-full transition-all duration-500 relative" style="width: 0%">
+              <div class="exp-shimmer"></div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center text-[11px] text-slate-400">
+            <span id="next-rank-progress">Còn 4 Level nữa để thăng hạng Silver (Bạc Tinh Anh)</span>
+            <span class="text-slate-500">Mỗi phút = +10 EXP</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===============================================
+         NAVIGATION TABS
+         =============================================== -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800/80">
+      <button onclick="switchTab('tab-timer')" data-tab="tab-timer" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+        <span>⏱️</span> Cày Cấp (Focus)
+      </button>
+      <button onclick="switchTab('tab-quests')" data-tab="tab-quests" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
+        <span>📜</span> Nhiệm Vụ Hàng Ngày
+      </button>
+      <button onclick="switchTab('tab-ranks')" data-tab="tab-ranks" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
+        <span>🏆</span> Bảng Rank Danh Vọng
+      </button>
+      <button onclick="switchTab('tab-shop')" data-tab="tab-shop" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
+        <span>🛒</span> Cửa Hàng RPG
+      </button>
+      <button onclick="switchTab('tab-logs')" data-tab="tab-logs" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
+        <span>📊</span> Lịch Sử & Thống Kê
+      </button>
+    </div>
+
+    <!-- ===============================================
+         TAB 1: FOCUS TIMER & POMODORO (CÀY CẤP)
+         =============================================== -->
+    <div id="tab-timer" class="space-y-6">
+      
+      <!-- Mode selection & Ambient Sound bar -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+        
+        <!-- Timer Modes -->
+        <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+          <button onclick="setTimerMode('POMODORO')" data-mode="POMODORO" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 border border-indigo-400">
+            🍅 Pomodoro (25p)
+          </button>
+          <button onclick="setTimerMode('DEEP_WORK')" data-mode="DEEP_WORK" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
+            🧠 Deep Work (50p)
+          </button>
+          <button onclick="setTimerMode('CUSTOM', 15)" data-mode="CUSTOM" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
+            ⚡ 15 Phút
+          </button>
+          <button onclick="setTimerMode('STOPWATCH')" data-mode="STOPWATCH" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
+            🛑 Bấm Giờ Tự Do
+          </button>
+        </div>
+
+        <!-- Ambient Sound Generator -->
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-400 font-medium">🎧 Âm thanh vòm:</span>
+          <select id="ambient-sound-select" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+            <option value="off">Tắt âm vòm</option>
+            <option value="rain">Mưa Rào Thư Giãn (Rain)</option>
+            <option value="brown">Tiếng Ồn Nâu (Deep Focus)</option>
+            <option value="white">Tiếng Ồn Trắng (White Noise)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Huge Timer Display & Circular Ring -->
+      <div class="rpg-card rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center">
+        
+        <div id="timer-container" class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center mb-6 transition-all duration-300">
+          
+          <!-- SVG Circular Progress Ring -->
+          <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 300 300">
+            <!-- Background circle -->
+            <circle
+              cx="150" cy="150" r="130"
+              fill="transparent"
+              stroke="rgba(30, 41, 59, 0.6)"
+              stroke-width="14"
+            />
+            <!-- Progress circle -->
+            <circle
+              id="timer-progress-ring"
+              cx="150" cy="150" r="130"
+              fill="transparent"
+              stroke="url(#timerGradient)"
+              stroke-width="14"
+              stroke-linecap="round"
+              stroke-dasharray="816.8"
+              stroke-dashoffset="0"
+              class="timer-ring-circle"
+            />
+            <defs>
+              <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#6366f1" />
+                <stop offset="50%" stop-color="#a855f7" />
+                <stop offset="100%" stop-color="#f59e0b" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Inside Ring Content -->
+          <div class="absolute flex flex-col items-center justify-center">
+            <div id="timer-status" class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-1">
+              READY TO FOCUS
+            </div>
+            <div id="timer-display" class="font-mono text-5xl sm:text-6xl font-black tracking-tight text-white drop-shadow-md">
+              25:00
+            </div>
+            <div class="text-xs font-semibold text-slate-400 mt-2 flex items-center gap-1.5">
+              <span>Tích lũy:</span>
+              <span class="text-indigo-400 font-bold">+10 EXP/phút</span>
+              <span>•</span>
+              <span class="text-yellow-400 font-bold">+2 🪙/phút</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Control Action Buttons -->
+        <div class="flex items-center gap-4">
+          <button id="btn-timer-start" onclick="startTimer()" class="rpg-btn px-8 py-3.5 rounded-2xl text-base font-extrabold tracking-wide uppercase bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white shadow-xl shadow-indigo-600/40 flex items-center gap-2">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            Bắt Đầu Cày Cấp
+          </button>
+          
+          <button id="btn-timer-pause" onclick="pauseTimer()" class="hidden rpg-btn px-8 py-3.5 rounded-2xl text-base font-extrabold tracking-wide uppercase bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-xl shadow-amber-500/30 flex items-center gap-2">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            Tạm Dừng
+          </button>
+
+          <button id="btn-timer-reset" onclick="resetTimer()" title="Đặt lại đồng hồ" class="p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+        </div>
+
+        <!-- Motivation Banner -->
+        <div class="mt-8 text-xs text-slate-400 max-w-md mx-auto">
+          💡 <span class="text-slate-300 font-semibold">Lời khuyên chiến binh:</span> Đặt điện thoại ở chế độ im lặng, tập trung trọn vẹn trong 25 phút. Mỗi phút bạn ngồi vào bàn học là một bước tiến gần hơn đến Rank Cao Thủ!
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ===============================================
+         TAB 2: DAILY QUESTS (NHIỆM VỤ HÀNG NGÀY)
+         =============================================== -->
+    <div id="tab-quests" class="hidden space-y-6">
+      
+      <!-- Top Action Bar -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+        
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-1.5">
+          <button data-filter="all" class="quest-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white">
+            Tất Cả
+          </button>
+          <button data-filter="active" class="quest-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">
+            Chưa Hoàn Thành
+          </button>
+          <button data-filter="completed" class="quest-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200">
+            Đã Xong
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="resetAllQuests()" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-all flex items-center gap-1.5">
+            <span>🔄</span> Làm Mới Ngày
+          </button>
+          <button onclick="openAddQuestModal()" class="rpg-btn px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+            <span>➕</span> Thêm Nhiệm Vụ Mới
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Add Template Suggestions -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 text-xs no-scrollbar">
+        <span class="text-slate-500 font-semibold flex-shrink-0">Gợi ý nhanh:</span>
+        <button onclick="addCustomQuest('Giải 5 bài tập Toán Hình & Giải Tích', 'Toán', 'medium')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
+          📐 Giải bài Toán (+160 EXP)
+        </button>
+        <button onclick="addCustomQuest('Học & Thuộc 30 từ vựng Sinh học 12', 'Sinh học', 'medium')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
+          🧬 Từ vựng Sinh học (+160 EXP)
+        </button>
+        <button onclick="addCustomQuest('Luyện 1 Đề Thi Thử Tốt Nghiệp', 'Luyện thi', 'hard')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
+          📝 Giải 1 đề thi thử (+300 EXP)
+        </button>
+        <button onclick="addCustomQuest('Đọc 20 trang sách chuyên ngành', 'Đọc sách', 'easy')" class="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 text-slate-300">
+          📖 Đọc sách 20 trang (+80 EXP)
+        </button>
+      </div>
+
+      <!-- Dynamic Quests List -->
+      <div id="quests-list" class="space-y-3">
+        <!-- Rendered via JS -->
+      </div>
+
+    </div>
+
+    <!-- ===============================================
+         TAB 3: RANK LADDER & MILESTONES (BẢNG RANK)
+         =============================================== -->
+    <div id="tab-ranks" class="hidden space-y-6">
+      
+      <div class="rpg-card rounded-2xl p-6">
+        <div class="mb-6">
+          <h3 class="font-display font-black text-lg text-white">LỘ TRÌNH THĂNG HẠNG DANH VỌNG</h3>
+          <p class="text-xs text-slate-400 mt-1">
+            Vượt qua các mốc Level để bước lên những cảnh giới cao hơn. Càng lên cao, hào quang tỏa sáng càng rực rỡ!
+          </p>
+        </div>
+
+        <div id="rank-milestones-list" class="space-y-3">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===============================================
+         TAB 4: RPG SHOP (CỬA HÀNG VẬT PHẨM & BUFF)
+         =============================================== -->
+    <div id="tab-shop" class="hidden space-y-6">
+      
+      <div class="rpg-card rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+          <div>
+            <h3 class="font-display font-black text-lg text-white">CỬA HÀNG CHIẾN BINH TRI THỨC</h3>
+            <p class="text-xs text-slate-400 mt-1">
+              Dùng vàng bạn cày cuốc được sau mỗi phút học tập để sắm Bùa X2 EXP, Danh hiệu và Khung Avatar cực chất!
+            </p>
+          </div>
+          <div class="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 px-4 py-2 rounded-xl text-yellow-400 font-bold text-sm">
+            <span>Số dư của bạn:</span>
+            <span id="shop-balance" class="font-mono text-base font-black">50</span>
+            <span>🪙</span>
+          </div>
+        </div>
+
+        <div id="shop-items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===============================================
+         TAB 5: STATS & ACTIVITY LOGS
+         =============================================== -->
+    <div id="tab-logs" class="hidden space-y-6">
+      
+      <!-- Summary Metrics Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="rpg-card p-4 rounded-xl text-center">
+          <div class="text-xs font-bold text-slate-400 uppercase">Tổng Thời Gian</div>
+          <div id="stat-total-time" class="font-display font-black text-2xl text-indigo-400 mt-1">0p</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Thời gian tập trung</div>
+        </div>
+        <div class="rpg-card p-4 rounded-xl text-center">
+          <div class="text-xs font-bold text-slate-400 uppercase">Pomodoro Xong</div>
+          <div id="total-pomodoro-count" class="font-display font-black text-2xl text-purple-400 mt-1">0</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Phiên hoàn chỉnh</div>
+        </div>
+        <div class="rpg-card p-4 rounded-xl text-center">
+          <div class="text-xs font-bold text-slate-400 uppercase">Chuỗi Kỷ Lục</div>
+          <div class="font-display font-black text-2xl text-rose-400 mt-1">🔥 1</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Ngày liên tiếp</div>
+        </div>
+        <div class="rpg-card p-4 rounded-xl text-center">
+          <div class="text-xs font-bold text-slate-400 uppercase">Trạng Thái Lưu</div>
+          <div class="font-display font-black text-2xl text-emerald-400 mt-1">100%</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Tự động trên LocalStorage</div>
+        </div>
+      </div>
+
+      <!-- Activity Logs Feed -->
+      <div class="rpg-card rounded-2xl p-6">
+        <h3 class="font-display font-black text-base text-white mb-4 flex items-center gap-2">
+          <span>📜</span> NHẬT KÝ CHIẾN TRƯỜNG (ACTIVITY FEED)
+        </h3>
+        <div id="activity-logs-list" class="space-y-1 max-h-80 overflow-y-auto pr-2">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ===================================================
+       FOOTER
+       =================================================== -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-4 px-4 text-center text-xs text-slate-500">
+    Study RPG Gamification System • Mọi tiến độ được lưu tự động trên LocalStorage • F5 thoải mái không lo mất cấp độ!
+  </footer>
+
+  <!-- ===================================================
+       MODAL: LEVEL UP CELEBRATION
+       =================================================== -->
+  <div id="modal-levelup" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+    <div class="rpg-card max-w-sm w-full p-6 rounded-3xl border-2 border-indigo-500/50 text-center relative overflow-hidden animate-bounce">
+      <div class="text-6xl mb-3">🎉</div>
+      <div class="text-xs uppercase tracking-widest font-black text-amber-400 mb-1">CHÚC MỪNG CHIẾN BINH!</div>
+      <h3 id="modal-levelup-num" class="font-display font-black text-4xl text-white tracking-wider mb-2">
+        LEVEL 2
+      </h3>
+      <p class="text-xs text-slate-300 mb-4">
+        Sức mạnh tri thức của bạn đã tăng lên một tầm cao mới!
+      </p>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 mb-5 flex items-center justify-around">
+        <div>
+          <div class="text-[10px] text-slate-500 uppercase font-bold">Thưởng Thăng Cấp</div>
+          <div id="modal-levelup-reward" class="font-mono font-bold text-yellow-400 text-base">+50 Vàng</div>
+        </div>
+        <div>
+          <div class="text-[10px] text-slate-500 uppercase font-bold">Chỉ Số Trí Tuệ</div>
+          <div class="font-mono font-bold text-indigo-400 text-base">+100 Focus</div>
+        </div>
+      </div>
+      <button onclick="closeLevelUpModal()" class="w-full py-3 rounded-xl font-display font-bold text-sm bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/40">
+        TIẾP TỤC CÀY CUỐC ⚔️
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       MODAL: RANK UP CELEBRATION
+       =================================================== -->
+  <div id="modal-rankup" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+    <div class="rpg-card max-w-md w-full p-8 rounded-3xl border-2 border-amber-400 text-center relative overflow-hidden glow-gold">
+      <div id="modal-rankup-icon" class="text-7xl mb-3 animate-pulse">🥇</div>
+      <div class="text-xs uppercase tracking-widest font-black text-amber-400 mb-1">THĂNG HẠNG DANH VỌNG MỚI!</div>
+      <h3 id="modal-rankup-name" class="font-display font-black text-2xl text-amber-400 tracking-wider mb-2">
+        GOLD - VÀNG CHIẾN TƯỚNG
+      </h3>
+      <p id="modal-rankup-desc" class="text-sm text-slate-300 mb-6">
+        Chúc mừng bạn đã xuất sắc vượt qua các thử thách học tập để thăng hạng!
+      </p>
+      <button onclick="closeRankUpModal()" class="w-full py-3.5 rounded-xl font-display font-bold text-sm bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 shadow-xl shadow-yellow-500/40">
+        TIẾP NHẬN DANH VỌNG 👑
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       MODAL: ADD CUSTOM QUEST
+       =================================================== -->
+  <div id="modal-add-quest" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+    <div class="rpg-card max-w-md w-full p-6 rounded-2xl border border-slate-700">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-base text-white">➕ THÊM NHIỆM VỤ MỚI</h3>
+        <button onclick="closeAddQuestModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Tên mục tiêu / Nhiệm vụ:</label>
+          <input id="input-quest-title" type="text" placeholder="VD: Giải 10 bài tập Toán Tích Phân, Học 20 từ vựng Sinh học..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Môn học / Chủ đề:</label>
+            <input id="input-quest-cat" type="text" placeholder="VD: Toán, Sinh, Anh, Lý..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Độ khó thử thách:</label>
+            <select id="input-quest-diff" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+              <option value="easy">Dễ (+80 EXP, +20 Vàng)</option>
+              <option value="medium" selected>Vừa (+160 EXP, +45 Vàng)</option>
+              <option value="hard">Khó (+300 EXP, +80 Vàng)</option>
+              <option value="boss">Boss Cực Khó (+650 EXP, +180 Vàng)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button onclick="closeAddQuestModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-slate-800">
+            Hủy
+          </button>
+          <button onclick="submitNewQuest()" class="px-5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30">
+            Thêm Nhiệm Vụ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       LOFI GIRL YOUTUBE MUSIC WIDGET
+       =================================================== -->
+  <div id="lofi-widget" class="fixed bottom-4 right-4 z-40 flex flex-col items-end">
+    
+    <!-- Expanded Floating Card -->
+    <div id="lofi-expanded" class="hidden mb-2.5 rpg-card rounded-3xl p-4 w-80 sm:w-88 border-2 border-purple-500/40 shadow-2xl shadow-purple-950/80">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm">🎧</span>
+          <span class="font-display font-black text-xs text-purple-300 uppercase tracking-wider">Lofi Girl Radio</span>
+          <span class="text-[9px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 px-1.5 py-0.5 rounded-full animate-pulse">● LIVE</span>
+        </div>
+        <button onclick="toggleLofiExpand()" class="text-slate-400 hover:text-white text-xs font-bold p-1">✕</button>
+      </div>
+
+      <!-- YouTube Embed Frame -->
+      <div class="w-full aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 mb-3 shadow-inner">
+        <iframe
+          id="lofi-iframe"
+          class="w-full h-full"
+          src="https://www.youtube.com/embed/jfKfPfyJRdk?enablejsapi=1&origin=https://localhost"
+          title="Lofi Girl Live Stream"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- Controls & Stations -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
+          <span>Kênh Phát Trực Tiếp:</span>
+        </div>
+        <select id="lofi-station-select" onchange="changeLofiStation(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-purple-500">
+          <option value="jfKfPfyJRdk" selected>🌸 Lofi Hip Hop Radio (Beats to relax/study)</option>
+          <option value="4xDzrJKXOOY">🌃 Synthwave Radio (Chill beats to chill/game)</option>
+          <option value="7NOSDKb0HlU">🎹 Peaceful Piano Radio (Thư giãn tĩnh lặng)</option>
+        </select>
+        
+        <div class="flex items-center justify-between pt-1 text-[11px] text-slate-400">
+          <span>⚡ Tự động mở khi bấm Pomodoro</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="lofi-autostart-toggle" checked class="sr-only peer">
+            <div class="w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-purple-600"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimized Floating Pill -->
+    <div id="lofi-minimized" class="rpg-card rounded-2xl p-2 px-3.5 flex items-center gap-3 border border-purple-500/40 hover:border-purple-400 shadow-2xl shadow-purple-950/70 transition-all cursor-pointer">
+      <div onclick="toggleLofiExpand()" class="relative w-7 h-7 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
+        <img src="https://img.youtube.com/vi/jfKfPfyJRdk/hqdefault.jpg" alt="Lofi Girl" class="w-full h-full object-cover">
+        <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-400"></span>
+      </div>
+      <div onclick="toggleLofiExpand()" class="text-left">
+        <div class="text-[9px] font-extrabold uppercase tracking-wider text-purple-400 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> LOFI GIRL
+        </div>
+        <div id="lofi-mini-label" class="text-xs font-bold text-slate-200 truncate max-w-[120px] sm:max-w-[140px]">
+          Beats to relax/study
+        </div>
+      </div>
+      <div class="flex items-center gap-1" id="lofi-eq-container" onclick="toggleLofiExpand()">
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+      </div>
+      <button onclick="toggleLofiExpand()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white text-xs font-bold" title="Mở rộng Lofi Player">
+        ⛶
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+  <script>
+    function openAddQuestModal() {
+      document.getElementById('modal-add-quest').classList.remove('hidden');
+      document.getElementById('input-quest-title').focus();
+    }
+    function closeAddQuestModal() {
+      document.getElementById('modal-add-quest').classList.add('hidden');
+    }
+    function submitNewQuest() {
+      const title = document.getElementById('input-quest-title').value;
+      const cat = document.getElementById('input-quest-cat').value;
+      const diff = document.getElementById('input-quest-diff').value;
+      if (!title || !title.trim()) {
+        alert("Vui lòng nhập tên nhiệm vụ học tập!");
+        return;
+      }
+      addCustomQuest(title, cat || 'Học tập', diff);
+      document.getElementById('input-quest-title').value = '';
+      closeAddQuestModal();
+    }
+  </script>
+</body>
+</html>

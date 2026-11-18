@@ -29,11 +29,18 @@ window.Theater = (() => {
   el('theater-media-status').textContent=`${media.provider} · Bấm Play trong màn hình để phát. Nội dung phát riêng trên máy bạn; một số nội dung có thể bị nhà cung cấp chặn nhúng.`;
   return true;
  }
+ function personAvatar(name,userId,mine){
+  const colors=['#818cf8','#e5af6b','#c084fc','#6cb8cf','#c77993'];
+  const hash=Array.from(userId||'').reduce((total,char)=>total+char.charCodeAt(0),0);
+  const shirt=mine?'#55cdb0':colors[hash%colors.length];
+  const initials=String(name||'Bạn học').trim().split(/\s+/).slice(0,2).map(part=>Array.from(part)[0]||'').join('').toUpperCase();
+  return `<span class="theater-person" aria-hidden="true"><svg viewBox="0 0 56 68" focusable="false"><ellipse cx="28" cy="62" rx="22" ry="4" fill="#000" opacity=".3"/><path d="M17 43h22l4 19H32l-4-12-4 12H13Z" fill="#202a40"/><path d="M17 29Q28 24 39 29l8 20-8 3-5-14H22l-5 14-8-3Z" fill="${shirt}"/><rect x="24" y="20" width="8" height="10" rx="3" fill="#dba77f"/><circle cx="28" cy="15" r="12" fill="#e9bd95"/><path d="M16 16V13C16-1 40-1 40 13v5l-5-8c-5 4-11 1-14 0l-5 8Z" fill="#322b31"/><path d="M15 36Q28 29 41 36v19H15Z" fill="${shirt}"/><text x="28" y="47" text-anchor="middle" fill="#11212a" font-size="10" font-weight="800">${escapeHtml(initials)}</text><path d="M8 52q20-8 40 0v9H8Z" fill="#31242b" opacity=".9"/></svg></span>`;
+ }
  function renderSeats(){
   const map=new Map(rows.map(row=>[row.seat,row]));
   el('theater-seats').innerHTML='ABCDEF'.split('').map(letter=>`<div class="theater-seat-row"><span class="theater-row-label">${letter}</span><div class="theater-seat-grid">${Array.from({length:8},(_,i)=>{
    const id=letter+(i+1),occupant=map.get(id),mine=occupant?.user_id===account;
-   return `<button type="button" data-seat="${id}" class="theater-seat ${mine?'is-mine':occupant?'is-occupied':''}" aria-label="Ghế ${id}${occupant?': '+escapeHtml(occupant.display_name):': còn trống'}" title="${occupant?escapeHtml(occupant.display_name):'Chọn ghế '+id}" aria-pressed="${mine}" ${!connected||!account||busy||(occupant&&!mine)?'disabled':''}>${id}<span aria-hidden="true">${mine?'●':occupant?'●':''}</span></button>`;
+   return `<button type="button" data-seat="${id}" data-seat-occupied="${!!occupant}" class="theater-seat ${mine?'is-mine':occupant?'is-occupied':''}" aria-label="Ghế ${id}${occupant?': '+escapeHtml(occupant.display_name)+(mine?' (bạn)':''):': còn trống'}" title="${occupant?escapeHtml(occupant.display_name):'Chọn ghế '+id}" aria-pressed="${mine}" ${!connected||!account||busy||(occupant&&!mine)?'disabled':''}>${occupant?personAvatar(occupant.display_name,occupant.user_id,mine):''}<span class="theater-seat-code">${id}</span>${occupant?`<span class="theater-seat-name">${mine?'Bạn':escapeHtml(occupant.display_name)}</span>`:''}${mine?'<span class="theater-you-marker" aria-hidden="true">▼</span>':''}</button>`;
   }).join('')}</div></div>`).join('');
   el('theater-occupancy').textContent=`${rows.length}/48 ghế`;
   el('theater-my-seat').textContent=seat?`Bạn đang ngồi ghế ${seat}`:'Chọn một ghế để ngồi học';

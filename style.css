@@ -639,12 +639,17 @@ body.zen-active {
 .theater-stage-edge {height:10px;max-width:46rem;background:linear-gradient(#8e6945,#2e2017);margin:0 auto 1rem;border-radius:0 0 45% 45%;}
 .theater-seat-hint {text-align:center;font-size:.5rem;letter-spacing:.12em;color:#8e8579;margin:1rem 0;}
 .theater-seating {max-width:42rem;margin:auto;padding:1rem 0;transform:perspective(1000px) rotateX(8deg);}
-.theater-seat-row {display:flex;align-items:center;gap:.5rem;margin:.65rem 0;}
+.theater-seat-row {display:flex;align-items:center;gap:.5rem;margin:1.45rem 0;}
 .theater-row-label {width:1rem;font-size:.6rem;color:#8c8379;}
 .theater-seat-grid {flex:1;min-width:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) 1rem repeat(4,minmax(0,1fr));gap:.45rem;}
 .theater-seat:nth-child(5){grid-column:6;}
-.theater-seat {position:relative;height:2.5rem;border:1px solid #8e575366;border-bottom:5px solid #291717;border-radius:.5rem .5rem .3rem .3rem;background:linear-gradient(#593535,#3c2428 70%,#6f4342);box-shadow:0 5px 5px #0008,inset 3px 0 #ffffff06,inset -3px 0 #0004;color:#bda3a0;font-size:.6rem;font-weight:700;}
-.theater-seat span {position:absolute;top:2px;right:4px;font-size:.4rem;}
+.theater-seat {position:relative;height:3.5rem;border:1px solid #8e575366;border-bottom:5px solid #291717;border-radius:.5rem .5rem .3rem .3rem;background:linear-gradient(#593535,#3c2428 70%,#6f4342);box-shadow:0 5px 5px #0008,inset 3px 0 #ffffff06,inset -3px 0 #0004;color:#bda3a0;font-size:.6rem;font-weight:700;isolation:isolate;}
+.theater-seat-code {position:absolute;bottom:1px;left:0;right:0;text-align:center;font-size:.55rem;line-height:1.2;z-index:2;}
+.theater-person {position:absolute;left:50%;top:-.8rem;transform:translateX(-50%);width:3.1rem;height:3.8rem;pointer-events:none;filter:drop-shadow(0 3px 3px #0008);}
+.theater-person svg {display:block;width:100%;height:100%;}
+.theater-seat-name {position:absolute;left:-.15rem;right:-.15rem;bottom:-1.15rem;font-size:.55rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;color:#eed9b3;}
+.theater-you-marker {position:absolute;top:-1.5rem;left:0;right:0;text-align:center;color:#88ffe0;font-size:.65rem;line-height:1;}
+.theater-seat.is-mine .theater-seat-name {color:#a7f3d0;font-weight:800;}
 .theater-seat:not(:disabled):hover {border-color:#e1c69b;transform:translateY(-2px);}
 .theater-seat.is-occupied {background:linear-gradient(#79633b,#463c2a);color:#ffe1a2;border-color:#bea15c;}
 .theater-seat.is-mine {background:linear-gradient(#2d796e,#204d46);color:#c3fff0;border-color:#74d7ba;border-bottom-color:#153f35;box-shadow:0 0 14px #74d7ba20;}
@@ -664,3 +669,4 @@ body.zen-active {
 @media(max-width:600px){.theater-room{padding:0 .6rem 1rem}.theater-sidebar{display:flex}.theater-seat-grid{gap:.2rem;grid-template-columns:repeat(4,minmax(0,1fr)) .5rem repeat(4,minmax(0,1fr));}.theater-seat{height:2.1rem;font-size:.5rem}.theater-seat-row{gap:.2rem}.theater-legend{gap:.5rem}.theater-ceiling{height:2.6rem}.theater-welcome span{font-size:.55rem}}
 
 #theater-screen{min-height:200px}#theater-screen[data-provider="Spotify"]{aspect-ratio:auto;height:352px}
+@media(max-width:600px){.theater-seat{height:2.9rem}.theater-person{width:2.1rem;height:3rem;top:-.65rem}.theater-seat-name{font-size:.46rem;bottom:-1rem}.theater-seat-code{font-size:.48rem}.theater-you-marker{top:-1.3rem}}

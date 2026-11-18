@@ -388,6 +388,7 @@
       <button onclick="switchTab('tab-logs')" data-tab="tab-logs" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
         <span>📊</span> Lịch Sử & Thống Kê
       </button>
+    <button type="button" onclick="switchTab('tab-theater')" data-tab="tab-theater" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white">🎬 Theater</button>
     </div>
 
     <!-- ===============================================
@@ -693,6 +694,26 @@
 
     </div>
 
+    <div id="tab-theater" class="hidden space-y-6">
+      <div class="theater-heading"><div><p class="theater-eyebrow">STUDY TOGETHER</p><h2>Theater</h2><p>Một chỗ ngồi, một khoảng tập trung. Cùng học trong rạp nhỏ của chúng mình.</p></div><button type="button" onclick="switchTab('tab-timer')">← Trở về timer</button></div>
+      <div class="theater-layout">
+        <section class="theater-room" aria-label="Phòng học chung 48 ghế">
+          <div class="theater-ceiling" aria-hidden="true">✦　　　　　✦　　　　　✦</div>
+          <p class="theater-screen-label">MÀN HÌNH CỦA BẠN</p>
+          <div class="theater-stage"><div id="theater-screen"><div class="theater-welcome">▶<strong>Học cùng một chút cảm hứng</strong><span>Dán link YouTube hoặc Spotify để mở màn hình.</span></div></div></div>
+          <div class="theater-stage-edge" aria-hidden="true"></div>
+          <p class="theater-seat-hint">MÀN HÌNH PHÍA TRƯỚC · CHỌN GHẾ BÊN DƯỚI</p>
+          <div id="theater-seats" class="theater-seating"></div>
+          <div class="theater-legend"><span>🟤 Trống</span><span>🟡 Có người</span><span>🟢 Ghế của bạn</span><strong id="theater-occupancy">0/48 ghế</strong></div>
+        </section>
+        <aside class="theater-sidebar">
+          <section class="theater-card"><p class="theater-eyebrow">PHIÊN HỌC CỦA BẠN</p><div id="theater-timer" class="theater-timer">25:00</div><p id="theater-timer-label"></p><div class="theater-controls"><button id="theater-start" onclick="startTimer()">▶ Bắt đầu</button><button id="theater-pause" onclick="pauseTimer()" hidden>Ⅱ Tạm dừng</button><button onclick="resetTimer()">↺ Đặt lại</button></div><label for="theater-duration">Thời gian tập trung</label><select id="theater-duration" onchange="applyCustomTimerDuration(this.value)"><option value="">Chọn số phút…</option><option>5</option><option>10</option><option>15</option><option>25</option><option>30</option><option>45</option><option>50</option><option>60</option><option>90</option><option>120</option></select><p class="theater-small">Timer dùng chung với chế độ Focus. EXP, nhiệm vụ và streak vẫn được tính như bình thường.</p></section>
+          <section class="theater-card"><h3>Mở màn hình</h3><form id="theater-media-form"><label for="theater-link">Link YouTube / Spotify</label><input id="theater-link" type="url" required placeholder="https://www.youtube.com/watch?v=…"><button type="submit">Phát trên màn hình</button></form><p id="theater-media-status" role="status" class="theater-small">Âm thanh và video phát riêng trên máy bạn, chưa đồng bộ phát với người khác.</p><div class="theater-controls"><button id="theater-stop-media" type="button">Tắt màn hình</button><a id="theater-external" href="#" target="_blank" rel="noopener noreferrer" hidden>Mở bản gốc ↗</a></div></section>
+          <section class="theater-card"><h3 id="theater-my-seat">Chọn một ghế để ngồi học</h3><p id="theater-status" role="status" class="theater-small"></p><button id="theater-leave-seat" type="button" disabled>Rời ghế</button><p class="theater-small">Trong phòng, mọi người thấy tên hồ sơ và vị trí ghế của bạn. Ghế tự giải phóng sau tối đa 2 phút mất kết nối.</p><p id="theater-people" class="theater-small"></p></section>
+        </aside>
+      </div>
+    </div>
+
   </main>
 
   <!-- ===================================================
@@ -916,6 +937,7 @@
   <script src="assets/supabase.js"></script>
   <script src="assets/cloud-config.js"></script>
   <script src="assets/cloud-save.js"></script>
+  <script src="assets/theater.js"></script>
   <script src="app.js"></script>
   <script>
     function openAddQuestModal() {

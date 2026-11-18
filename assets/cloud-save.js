@@ -204,6 +204,7 @@ window.CloudSave = (() => {
     setAuthBusy(true);
     try {
       if (dirty && !await flush() && !confirm('Tiến độ mới nhất chưa lên cloud. Bản này vẫn được giữ trong trình duyệt cho tài khoản hiện tại. Vẫn đăng xuất?')) return;
+      await window.Theater?.releaseSeat();
       const { error } = await client.auth.signOut({ scope: 'local' });
       if (error) throw error;
       message('Đã đăng xuất. Bạn đang dùng tiến độ khách trên máy.');
@@ -252,5 +253,5 @@ window.CloudSave = (() => {
     window.addEventListener('beforeunload', event => { if (user && dirty) { event.preventDefault(); event.returnValue = ''; } });
     setInterval(() => { if (dirty && !conflict) void flush(); }, 30000);
   }
-  return { init, queueSave, flush };
+  return { init, queueSave, flush, getClient: () => client, getUser: () => user ? { id: user.id } : null };
 })();

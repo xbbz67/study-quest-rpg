@@ -613,7 +613,7 @@ function startTimer() {
 
   // Auto show Lofi Girl if toggled
   const lofiAuto = document.getElementById('lofi-autostart-toggle');
-  if (lofiAuto && lofiAuto.checked) {
+  if (lofiAuto && lofiAuto.checked && !document.body.classList.contains('theater-active')) {
     const lofiExpanded = document.getElementById('lofi-expanded');
     if (lofiExpanded && lofiExpanded.classList.contains('hidden')) {
       toggleLofiExpand();
@@ -748,6 +748,7 @@ function onTimerCompleted() {
 }
 
 function updateTimerUI() {
+  window.Theater?.renderTimer();
   const timerDisplay = document.getElementById('timer-display');
   const timerStatus = document.getElementById('timer-status');
   const timerCircle = document.getElementById('timer-progress-ring');
@@ -1560,7 +1561,7 @@ function escapeHtml(str) {
 
 // Tab Switching
 function switchTab(tabId) {
-  const tabs = ['tab-timer', 'tab-quests', 'tab-ranks', 'tab-shop', 'tab-logs'];
+  const tabs = ['tab-timer', 'tab-quests', 'tab-ranks', 'tab-shop', 'tab-logs', 'tab-theater'];
   tabs.forEach(t => {
     const el = document.getElementById(t);
     if (el) el.classList.add('hidden');
@@ -1580,6 +1581,8 @@ function switchTab(tabId) {
   if (tabId === 'tab-quests') renderQuests();
   if (tabId === 'tab-ranks') renderRankMilestones();
   if (tabId === 'tab-shop') renderShop();
+  if (tabId === 'tab-theater') window.Theater?.enter();
+  else window.Theater?.leave();
 }
 
 // ==========================================

@@ -1,3 +1,42 @@
+## Theater
+
+Tab Theater có phòng chung 48 ghế, 6 dãy A–F, và màn hình riêng nhận link HTTPS YouTube video/playlist hoặc Spotify track/playlist/album/episode/show/artist. Dùng player nhúng chính thức; người dùng bấm Play. Nội dung phát riêng mỗi máy, chưa đồng bộ phát cho cả phòng. Một số video bị chủ nội dung chặn nhúng; dùng liên kết Mở bản gốc nếu cần. Spotify có thể yêu cầu đăng nhập hoặc chỉ cho nghe thử tùy nội dung/tài khoản.
+
+Người đã đăng nhập chọn ghế, thấy tên hồ sơ và ghế của thành viên khác; không chia sẻ email. Danh sách cập nhật mỗi 10 giây. RPC chỉ đổi/rời ghế của tài khoản hiện tại và chống chọn trùng bằng ràng buộc unique. Giữ ghế được gia hạn khi ở phòng; ghế mất kết nối hết hạn sau 120 giây. Rời tab hoặc đăng xuất sẽ giải phóng ghế. Timer trong Theater dùng cùng phiên Focus, EXP, nhiệm vụ và streak hiện tại; nhạc Lofi nổi bị ẩn khi vào phòng.
+
+Schema: `supabase/migrations/20261118010000_theater.sql`. Frontend: `assets/theater.js`.
+
+## Thời lượng timer
+
+Giữ nguyên Pomodoro 25 phút và Deep Work 50 phút. Các phiên tùy chỉnh có nút chọn nhanh 5, 10, 15, 30, 45, 60, 90, 120 phút; có thể nhập số phút nguyên từ 1 tới 180. Mỗi phiên tùy chỉnh nghỉ 5 phút, thưởng hoàn thành cơ bản 2 EXP và 0,8 vàng cho mỗi phút đã chọn, ngoài thưởng tập trung từng phút. Mốc nhiệm vụ từ 15 phút và streak từ 30 phút giữ nguyên. Đổi chế độ khi đang chạy hoặc tạm dừng cần xác nhận bắt đầu lại; dữ liệu nhập không hợp lệ không thay đổi phiên đang chạy.
+
+## Cây chuyên cần từ streak
+
+Streak được minh họa thành cây: 0 ngày Hạt giống, 1 ngày Nảy mầm, 3 ngày Vươn thân, 7 ngày Phân cành, 14 ngày Xanh tán, 30 ngày Kết trái. Thanh tiến độ thể hiện số ngày từ mốc hiện tại tới mốc kế tiếp, không dùng EXP để lớn cây. Sau 30 ngày, cây giữ giai đoạn kết trái và bộ đếm vẫn tiếp tục tăng.
+
+Cây được suy ra trực tiếp từ streak đã lưu, không có bộ đếm tăng trưởng riêng. Ngày dùng đóng băng giữ nguyên cây; chỉ ngày học được tích streak mới giúp cây phát triển. Khi chuỗi gãy, cây về hạt giống. Tiến độ sẵn có tự áp dụng cho hình minh họa khi đăng nhập trên máy khác.
+
+## Shop và bảo vệ streak
+
+Shop có 22 vật phẩm, chia nhóm bảo vệ chuỗi, bùa hỗ trợ, bạn đồng hành, danh hiệu và khung avatar. Vật phẩm vĩnh viễn mua một lần, được trang bị/tháo miễn phí; chỉ dùng một bùa và một bạn đồng hành mỗi lần.
+
+- Đóng băng streak: 120 vàng/viên, tối đa 3 viên. Tự bảo vệ các ngày đã kết thúc mà không học; phải mua trước khi chuỗi bị gãy. Không tiêu viên cho hôm nay khi ngày chưa kết thúc và không cộng ngày streak cho ngày đóng băng.
+- Nếu cả khoảng nghỉ dài hơn số viên sẵn có, streak về 0 nhưng không tiêu các viên đó. Hoàn thành một phiên đếm ngược từ 30 phút để kiếm một ngày streak, tối đa một lần/ngày. Ngày tính theo giờ trên máy, nhất quán với nhiệm vụ hàng ngày.
+- Kho đóng băng và ngày đã bảo vệ nằm trong dữ liệu tiến độ của tài khoản, đồng bộ cloud cùng vàng và trang bị. Kiểm tra khi tải/mở trang, qua ngày mới và trước khi mua/nhận streak.
+- Bùa EXP có các mốc 15/30/60 phút; bùa vàng nhân đôi phần thưởng từ timer và nhiệm vụ, không nhân vàng lên cấp. Thú mới gồm cáo (+1 vàng/phút), mèo (+5% EXP, +2 vàng/phiên) và rồng (+15% EXP).
+- Nhiệm vụ tự tạo chỉ nhận phần thưởng một lần; có thể bỏ dấu hoàn thành nhưng không nhận lại thưởng khi tích lại.
+
+## Tài khoản và đồng bộ cloud
+
+Bản triển khai dùng Supabase Auth (email/mật khẩu) và bảng `study_progress` để giữ tiến độ trên nhiều máy. Chọn **Đăng nhập** trên website; tài khoản mới sẽ được hỏi trước khi chuyển tiến độ local lên cloud. Tài khoản đã có dữ liệu sẽ tải bản cloud. Tiến độ khách và từng tài khoản được lưu riêng trên máy.
+
+- Frontend: `assets/cloud-save.js`; cấu hình công khai: `assets/cloud-config.js`.
+- Schema và quyền truy cập: `supabase/migrations/20261117160000_cloud_progress.sql`. Bật RLS; chỉ chủ tài khoản đọc tiến độ. Hàm lưu kiểm tra danh tính và phiên bản để tránh hai máy ghi đè nhau.
+- Khi mất mạng, thay đổi được giữ trong cache riêng của tài khoản và thử đồng bộ lại. Nếu có xung đột, có thể xuất bản trên máy rồi tải bản cloud; bản local trước khi thay thế vẫn được giữ dự phòng.
+- Chỉ khóa anon/publishable được đưa vào frontend. Không đưa access token, mật khẩu database hoặc khóa service role lên GitHub.
+- Supabase bật xác nhận email. SMTP mặc định chỉ gửi cho email thành viên tổ chức và có giới hạn gửi. Muốn mở đăng ký cho mọi email, cấu hình SMTP riêng tại Supabase Dashboard → Authentication → Email. Không tắt xác nhận email để bỏ qua giới hạn này.
+- Site URL / redirect URL: `https://study-quest-rpg-beige.vercel.app/`.
+- SDK vendored: `@supabase/supabase-js` 2.119.0; giấy phép đi kèm `assets/supabase.LICENSE.txt`.
 
 # ⚔️ STUDY RPG - HỆ THỐNG CÀY CẤP & LEO RANK HỌC TẬP
 

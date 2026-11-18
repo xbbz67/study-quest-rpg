@@ -385,6 +385,27 @@ body.meme-focus-mode {
   .shop-filter-btn { padding: .5rem .65rem; }
 }
 
+/* Timer durations stay in the document flow, including in Zen Mode. */
+.timer-duration-panel { padding: 1rem; border: 1px solid #334155; border-radius: 1rem; background: #0f172ac9; min-width: 0; }
+.timer-duration-heading-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.timer-duration-heading-row > div { flex: 1 1 18rem; min-width: 0; }
+#timer-duration-heading { font-size: .8125rem; font-weight: 700; color: #e2e8f0; }
+#custom-timer-help { max-width: 38rem; font-size: .6875rem; line-height: 1.7; margin-top: .3rem; color: #94a3b8; }
+.timer-duration-form { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.timer-duration-form label { font-size: .6875rem; color: #cbd5e1; }
+.timer-duration-form input { width: 5rem; padding: .5rem .65rem; border: 1px solid #475569; border-radius: .6rem; background: #020617; color: #f8fafc; font-size: .8125rem; }
+.timer-duration-form button { padding: .55rem .8rem; border-radius: .6rem; background: #4f46e5; color: #fff; font-size: .6875rem; font-weight: 700; }
+.timer-duration-form button:hover { background: #6366f1; }
+.timer-duration-presets { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .5rem; }
+.timer-duration-preset { min-width: 0; padding: .65rem .25rem; border: 1px solid #334155; border-radius: .7rem; background: #1e293b; color: #e2e8f0; font-size: .875rem; font-weight: 700; transition: border-color .15s, background .15s; }
+.timer-duration-preset span { display: block; color: #94a3b8; font-size: .625rem; font-weight: 500; }
+.timer-duration-preset:hover { border-color: #818cf8; }
+.timer-duration-preset[aria-pressed="true"] { background: #312e81; border-color: #818cf8; color: #fff; }
+.timer-duration-preset[aria-pressed="true"] span { color: #c7d2fe; }
+.timer-duration-preset:focus-visible, .timer-duration-form input:focus-visible, .timer-duration-form button:focus-visible { outline: 2px solid #a5b4fc; outline-offset: 3px; }
+.timer-duration-message { min-height: 1rem; margin-top: .65rem; color: #a5b4fc; font-size: .6875rem; line-height: 1.5; }
+@media (max-width: 639px) { .timer-duration-presets { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
 /* Keep Zen content in normal document flow so music never covers the timer. */
 #cloud-dialog {
   width: min(92vw, 28rem);

@@ -406,8 +406,8 @@
           <button onclick="setTimerMode('DEEP_WORK')" data-mode="DEEP_WORK" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
             🧠 Deep Work (50p)
           </button>
-          <button onclick="setTimerMode('CUSTOM', 15)" data-mode="CUSTOM" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
-            ⚡ 15 Phút
+          <button onclick="setTimerMode('CUSTOM')" data-mode="CUSTOM" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
+            ⚡ <span id="custom-timer-mode-label">Tùy chỉnh (15p)</span>
           </button>
           <button onclick="setTimerMode('STOPWATCH')" data-mode="STOPWATCH" class="timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50">
             🛑 Bấm Giờ Tự Do
@@ -426,6 +426,31 @@
         </div>
 
       </div>
+
+      <section id="timer-duration-panel" class="timer-duration-panel" aria-labelledby="timer-duration-heading">
+        <div class="timer-duration-heading-row">
+          <div>
+            <h3 id="timer-duration-heading">Chọn nhịp tập trung của bạn</h3>
+            <p id="custom-timer-help">Chọn nhanh hoặc nhập 1–180 phút. Phiên tùy chỉnh nghỉ 5 phút; hoàn thành từ 30 phút để tích streak.</p>
+          </div>
+          <form class="timer-duration-form" onsubmit="event.preventDefault(); applyCustomTimerDuration(document.getElementById('custom-timer-minutes').value)">
+            <label for="custom-timer-minutes">Số phút</label>
+            <input id="custom-timer-minutes" type="number" min="1" max="180" step="1" value="15" required inputmode="numeric" aria-describedby="custom-timer-help">
+            <button type="submit">Áp dụng</button>
+          </form>
+        </div>
+        <div class="timer-duration-presets" role="group" aria-label="Thời lượng tập trung tùy chỉnh">
+          <button type="button" class="timer-duration-preset" data-timer-minutes="5" aria-pressed="false" onclick="applyCustomTimerDuration(5)">5 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="10" aria-pressed="false" onclick="applyCustomTimerDuration(10)">10 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="15" aria-pressed="false" onclick="applyCustomTimerDuration(15)">15 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="30" aria-pressed="false" onclick="applyCustomTimerDuration(30)">30 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="45" aria-pressed="false" onclick="applyCustomTimerDuration(45)">45 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="60" aria-pressed="false" onclick="applyCustomTimerDuration(60)">60 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="90" aria-pressed="false" onclick="applyCustomTimerDuration(90)">90 <span>phút</span></button>
+          <button type="button" class="timer-duration-preset" data-timer-minutes="120" aria-pressed="false" onclick="applyCustomTimerDuration(120)">120 <span>phút</span></button>
+        </div>
+        <p id="timer-duration-message" class="timer-duration-message" role="status" aria-live="polite"></p>
+      </section>
 
       <!-- Huge Timer Display & Circular Ring -->
       <div id="timer-panel" class="rpg-card rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center">

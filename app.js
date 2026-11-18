@@ -521,6 +521,8 @@ const TIMER_MODES = {
   CUSTOM: { label: 'Tùy Chỉnh', focusMinutes: 15, breakMinutes: 5, expReward: 30, goldReward: 15 },
   STOPWATCH: { label: 'Bấm Giờ Tự Do', focusMinutes: 0, breakMinutes: 0, expReward: 0, goldReward: 0 }
 };
+const CUSTOM_TIMER_PRESETS = [5, 10, 15, 30, 45, 60, 90, 120];
+const MAX_CUSTOM_TIMER_MINUTES = 180;
 
 let currentTimerMode = 'POMODORO';
 let timerState = 'IDLE'; // 'IDLE', 'RUNNING', 'PAUSED', 'BREAK'
@@ -532,22 +534,33 @@ let secondsAccumulator = 0; // Tracks every 60s of active study for real-time EX
 let isBreakSession = false;
 
 function setTimerMode(modeKey, customMinutes = null) {
-  if (timerState === 'RUNNING') {
-    if (!confirm("Phiên học đang diễn ra. Bạn có chắc muốn đổi chế độ và hủy phiên hiện tại?")) {
-      return;
+  if (!Object.prototype.hasOwnProperty.call(TIMER_MODES, modeKey)) {
+    setTimerDurationMessage('Chế độ đồng hồ không hợp lệ.');
+    return false;
+  }
+  const requestedMinutes = customMinutes === null ? TIMER_MODES.CUSTOM.focusMinutes : parseCustomTimerMinutes(customMinutes);
+  if (modeKey === 'CUSTOM' && requestedMinutes === null) {
+    setTimerDurationMessage('Nhập số phút nguyên từ 1 đến 180.');
+    return false;
+  }
+  if (timerState === 'RUNNING' || timerState === 'PAUSED') {
+    if (!confirm("Đồng hồ đang chạy hoặc tạm dừng. Đổi thời gian sẽ bắt đầu lại phiên hiện tại. Bạn muốn tiếp tục?")) {
+      return false;
     }
   }
 
   clearInterval(timerInterval);
+  sounds.stopAmbient();
   timerState = 'IDLE';
   currentTimerMode = modeKey;
   isBreakSession = false;
 
   const mode = TIMER_MODES[modeKey];
-  if (modeKey === 'CUSTOM' && customMinutes) {
-    mode.focusMinutes = customMinutes;
-    mode.expReward = Math.round(customMinutes * 2);
-    mode.goldReward = Math.round(customMinutes * 0.8);
+  if (modeKey === 'CUSTOM') {
+    mode.focusMinutes = requestedMinutes;
+    mode.label = `Tùy chỉnh (${requestedMinutes} phút)`;
+    mode.expReward = Math.round(requestedMinutes * 2);
+    mode.goldReward = Math.round(requestedMinutes * 0.8);
   }
 
   if (modeKey === 'STOPWATCH') {
@@ -562,6 +575,28 @@ function setTimerMode(modeKey, customMinutes = null) {
   secondsAccumulator = 0;
   updateTimerUI();
   updateTimerModeButtons();
+  setTimerDurationMessage(modeKey === 'CUSTOM' ? `Đã chọn ${mode.focusMinutes} phút tập trung · nghỉ ${mode.breakMinutes} phút.` : '');
+  return true;
+}
+
+function parseCustomTimerMinutes(value) {
+  if (!['string', 'number'].includes(typeof value) || (typeof value === 'string' && !value.trim())) return null;
+  const minutes = Number(value);
+  return Number.isInteger(minutes) && minutes >= 1 && minutes <= MAX_CUSTOM_TIMER_MINUTES ? minutes : null;
+}
+
+function setTimerDurationMessage(message) {
+  const element = document.getElementById('timer-duration-message');
+  if (element) element.textContent = message;
+}
+
+function applyCustomTimerDuration(value) {
+  const minutes = parseCustomTimerMinutes(value);
+  if (minutes === null) {
+    setTimerDurationMessage('Nhập số phút nguyên từ 1 đến 180.');
+    return false;
+  }
+  return setTimerMode('CUSTOM', minutes);
 }
 
 function startTimer() {
@@ -791,6 +826,13 @@ function updateTimerModeButtons() {
     } else {
       btn.className = 'timer-mode-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 border border-slate-700/50';
     }
+  });
+  const input = document.getElementById('custom-timer-minutes');
+  if (input) input.value = TIMER_MODES.CUSTOM.focusMinutes;
+  const label = document.getElementById('custom-timer-mode-label');
+  if (label) label.textContent = `Tùy chỉnh (${TIMER_MODES.CUSTOM.focusMinutes}p)`;
+  document.querySelectorAll('[data-timer-minutes]').forEach(button => {
+    button.setAttribute('aria-pressed', String(currentTimerMode === 'CUSTOM' && Number(button.dataset.timerMinutes) === TIMER_MODES.CUSTOM.focusMinutes));
   });
 }
 

@@ -1,3 +1,7 @@
+## Thời lượng timer
+
+Giữ nguyên Pomodoro 25 phút và Deep Work 50 phút. Các phiên tùy chỉnh có nút chọn nhanh 5, 10, 15, 30, 45, 60, 90, 120 phút; có thể nhập số phút nguyên từ 1 tới 180. Mỗi phiên tùy chỉnh nghỉ 5 phút, thưởng hoàn thành cơ bản 2 EXP và 0,8 vàng cho mỗi phút đã chọn, ngoài thưởng tập trung từng phút. Mốc nhiệm vụ từ 15 phút và streak từ 30 phút giữ nguyên. Đổi chế độ khi đang chạy hoặc tạm dừng cần xác nhận bắt đầu lại; dữ liệu nhập không hợp lệ không thay đổi phiên đang chạy.
+
 ## Cây chuyên cần từ streak
 
 Streak được minh họa thành cây: 0 ngày Hạt giống, 1 ngày Nảy mầm, 3 ngày Vươn thân, 7 ngày Phân cành, 14 ngày Xanh tán, 30 ngày Kết trái. Thanh tiến độ thể hiện số ngày từ mốc hiện tại tới mốc kế tiếp, không dùng EXP để lớn cây. Sau 30 ngày, cây giữ giai đoạn kết trái và bộ đếm vẫn tiếp tục tăng.

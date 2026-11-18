@@ -83,7 +83,8 @@
         <!-- Daily Streak Counter -->
         <div class="flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl text-rose-400 font-bold text-xs shadow-inner" title="Chuỗi cày cấp liên tục">
           <span>🔥</span>
-          <span id="streak-count" class="font-mono">1 ngày</span>
+          <span id="streak-count" class="font-mono">0 ngày</span>
+          <span class="ml-1 pl-2 border-l border-rose-500/20 text-cyan-300" title="Đóng băng streak có sẵn: tự bảo vệ ngày bỏ lỡ">❄️ <span id="streak-freeze-count" class="font-mono">0</span></span>
         </div>
 
         <!-- Active Buff Badge -->
@@ -450,7 +451,7 @@
           <div>
             <h3 class="font-display font-black text-lg text-white">CỬA HÀNG CHIẾN BINH TRI THỨC</h3>
             <p class="text-xs text-slate-400 mt-1">
-              Dùng vàng bạn cày cuốc được sau mỗi phút học tập để sắm Bùa X2 EXP, Danh hiệu và Khung Avatar cực chất!
+              Đổi vàng tập trung lấy vật phẩm bảo vệ chuỗi, bùa hỗ trợ và phong cách riêng của bạn.
             </p>
           </div>
           <div class="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 px-4 py-2 rounded-xl text-yellow-400 font-bold text-sm">
@@ -460,6 +461,35 @@
           </div>
         </div>
 
+        <section class="shop-freeze-feature" aria-labelledby="shop-freeze-heading">
+          <div class="shop-freeze-copy">
+            <div class="shop-feature-eyebrow">❄️ BẢO VỆ CHUỖI HỌC</div>
+            <h4 id="shop-freeze-heading">Lỡ một ngày, giữ vững nhịp học</h4>
+            <p>Mỗi viên <strong>Đóng băng streak</strong> tự bảo vệ một ngày đã bỏ lỡ. Hãy mua sẵn trước khi nghỉ; ngày được bảo vệ giữ nguyên chuỗi và không cộng thêm ngày học.</p>
+            <p class="shop-freeze-detail">Nếu số ngày nghỉ vượt quá số viên đang có, chuỗi sẽ bắt đầu lại và bạn vẫn giữ các viên chưa dùng. Hoàn thành một phiên từ 30 phút để tích streak hôm nay.</p>
+            <button type="button" onclick="setShopFilter('protection')" class="shop-freeze-link">Xem vật phẩm đóng băng <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="shop-freeze-stats">
+            <div><span class="shop-freeze-stat-label">TRONG TÚI</span><div class="shop-freeze-stat-number">❄️ <span id="shop-freeze-count">0</span><span class="shop-freeze-stat-unit"> / 3 viên</span></div></div>
+            <div class="shop-freeze-current"><span class="shop-freeze-stat-label">CHUỖI HIỆN TẠI</span><div class="shop-freeze-stat-number shop-freeze-streak">🔥 <span id="shop-streak-count">0</span><span class="shop-freeze-stat-unit"> ngày</span></div></div>
+            <span class="shop-freeze-note">Tự dùng khi đủ số viên bảo vệ</span>
+          </div>
+        </section>
+
+        <section class="shop-equipped-section" aria-labelledby="shop-equipped-heading">
+          <h4 id="shop-equipped-heading" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Trang bị của bạn</h4>
+          <div id="shop-equipped-list" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+        </section>
+
+        <div class="shop-filter-list" role="group" aria-label="Lọc loại vật phẩm">
+          <button type="button" onclick="setShopFilter('all')" class="shop-filter-btn" data-shop-filter="all" aria-pressed="true">Tất cả</button>
+          <button type="button" onclick="setShopFilter('protection')" class="shop-filter-btn" data-shop-filter="protection" aria-pressed="false">❄️ Bảo vệ</button>
+          <button type="button" onclick="setShopFilter('buff')" class="shop-filter-btn" data-shop-filter="buff" aria-pressed="false">✨ Bùa hỗ trợ</button>
+          <button type="button" onclick="setShopFilter('pet')" class="shop-filter-btn" data-shop-filter="pet" aria-pressed="false">🐾 Bạn đồng hành</button>
+          <button type="button" onclick="setShopFilter('title')" class="shop-filter-btn" data-shop-filter="title" aria-pressed="false">🏷️ Danh hiệu</button>
+          <button type="button" onclick="setShopFilter('frame')" class="shop-filter-btn" data-shop-filter="frame" aria-pressed="false">🖼️ Khung avatar</button>
+        </div>
+        <p id="shop-result" role="status" aria-live="polite" class="shop-result"></p>
         <div id="shop-items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Rendered via JS -->
         </div>
@@ -485,8 +515,8 @@
           <div class="text-[10px] text-slate-500 mt-0.5">Phiên hoàn chỉnh</div>
         </div>
         <div class="rpg-card p-4 rounded-xl text-center">
-          <div class="text-xs font-bold text-slate-400 uppercase">Chuỗi Kỷ Lục</div>
-          <div class="font-display font-black text-2xl text-rose-400 mt-1">🔥 1</div>
+          <div class="text-xs font-bold text-slate-400 uppercase">Chuỗi Hiện Tại</div>
+          <div class="font-display font-black text-2xl text-rose-400 mt-1">🔥 <span id="stat-streak-count">0</span></div>
           <div class="text-[10px] text-slate-500 mt-0.5">Ngày liên tiếp</div>
         </div>
         <div class="rpg-card p-4 rounded-xl text-center">

@@ -22,17 +22,30 @@ const RANKS = [
 ];
 
 const SHOP_ITEMS = [
-  { id: 'buff_exp_2x', category: 'buff', name: 'Bùa X2 EXP (30 Phút)', desc: 'Gấp đôi toàn bộ EXP nhận được khi học và làm nhiệm vụ trong 30 phút.', cost: 80, icon: '📜', durationMinutes: 30 },
-  { id: 'pet_owl', category: 'pet', name: 'Cú Mèo Thức Khuya', desc: 'Thần thú hộ mệnh tăng thêm +10% EXP vĩnh viễn khi tập trung.', cost: 250, icon: '🦉' },
-  { id: 'pet_coffee', category: 'pet', name: 'Ly Cà Phê Bất Tử', desc: 'Linh vật chống buồn ngủ, tăng +5 Vàng mỗi phiên Pomodoro.', cost: 200, icon: '☕' },
+  { id: 'streak_freeze', category: 'protection', name: 'Đóng băng streak', desc: 'Bảo vệ 1 ngày bỏ lỡ, tự dùng từ kho đã mua. Tối đa 3 viên. Giữ nguyên chuỗi, không cộng ngày. Nghỉ vượt số viên: reset chuỗi và giữ lại vật phẩm.', cost: 120, icon: '🧊' },
+  { id: 'buff_exp_2x_short', category: 'buff', name: 'Bùa Khởi Động X2 EXP', desc: 'Nhân đôi EXP từ timer và nhiệm vụ trong 15 phút. Mua là kích hoạt; chỉ dùng 1 bùa mỗi lần.', cost: 45, icon: '🪄', durationMinutes: 15, expMultiplier: 2 },
+  { id: 'buff_exp_2x', category: 'buff', name: 'Bùa X2 EXP (30 Phút)', desc: 'Nhân đôi EXP từ timer và nhiệm vụ trong 30 phút. Mua là kích hoạt; chỉ dùng 1 bùa mỗi lần.', cost: 80, icon: '📜', durationMinutes: 30, expMultiplier: 2 },
+  { id: 'buff_exp_2x_long', category: 'buff', name: 'Bùa Marathon X2 EXP', desc: 'Nhân đôi EXP từ timer và nhiệm vụ trong 60 phút. Mua là kích hoạt; chỉ dùng 1 bùa mỗi lần.', cost: 150, icon: '🔮', durationMinutes: 60, expMultiplier: 2 },
+  { id: 'buff_gold_2x', category: 'buff', name: 'Bùa Thịnh Vượng X2 Vàng', desc: 'Nhân đôi vàng từ timer và nhiệm vụ trong 30 phút, không áp dụng vàng lên cấp. Chỉ dùng 1 bùa mỗi lần.', cost: 100, icon: '💰', durationMinutes: 30, goldMultiplier: 2 },
+  { id: 'pet_owl', category: 'pet', name: 'Cú Mèo Thức Khuya', desc: 'Tăng 10% EXP từ timer và nhiệm vụ khi trang bị. Mỗi lần chỉ đồng hành cùng 1 thú cưng.', cost: 250, icon: '🦉', expBonus: 0.10 },
+  { id: 'pet_coffee', category: 'pet', name: 'Ly Cà Phê Bất Tử', desc: 'Thưởng thêm 5 vàng mỗi phiên đếm ngược hoàn thành khi trang bị.', cost: 200, icon: '☕', sessionGold: 5 },
+  { id: 'pet_fox', category: 'pet', name: 'Cáo Săn Kho Báu', desc: 'Thêm 1 vàng mỗi phút tập trung khi trang bị. Không nhận vàng trong giờ nghỉ.', cost: 400, icon: '🦊', perMinuteGold: 1 },
+  { id: 'pet_cat', category: 'pet', name: 'Mèo Đồng Hành', desc: 'Tăng 5% EXP và thưởng thêm 2 vàng mỗi phiên đếm ngược hoàn thành khi trang bị.', cost: 350, icon: '🐈', expBonus: 0.05, sessionGold: 2 },
+  { id: 'pet_dragon', category: 'pet', name: 'Rồng Tri Thức', desc: 'Tăng 15% EXP từ timer và nhiệm vụ khi trang bị. Mỗi lần chỉ đồng hành cùng 1 thú cưng.', cost: 650, icon: '🐉', expBonus: 0.15 },
   { id: 'title_night_owl', category: 'title', name: 'Chiến Binh Đêm Khuya', desc: 'Danh hiệu dành cho những người cày cuốc thâu đêm.', cost: 50, icon: '🌙' },
   { id: 'title_exam_slayer', category: 'title', name: 'Kẻ Hủy Diệt Đề Thi', desc: 'Danh hiệu tối thượng khi chuẩn bị vào phòng thi.', cost: 120, icon: '⚔️' },
   { id: 'title_gpa_wizard', category: 'title', name: 'Đại Pháp Sư GPA 4.0', desc: 'Danh hiệu tối cao của bậc học giả.', cost: 300, icon: '🎓' },
   { id: 'title_god_speed', category: 'title', name: 'Chúa Tể Không Trì Hoãn', desc: 'Không có việc gì ngày mai làm mà hôm nay không giải quyết!', cost: 500, icon: '⚡' },
-  { id: 'frame_gold', category: 'frame', name: 'Khung Hào Quang Vàng', desc: 'Khung viền phát sáng ánh kim rực rỡ quanh Avatar.', cost: 100, icon: '✨' },
-  { id: 'frame_neon_cyan', category: 'frame', name: 'Khung Cyber Neon', desc: 'Khung viền công nghệ tương lai phát sáng xanh cyan.', cost: 150, icon: '🩵' },
-  { id: 'frame_arcane_purple', category: 'frame', name: 'Khung Ma Thuật Hư Không', desc: 'Khung viền tím ma thuật bí ẩn.', cost: 250, icon: '🔮' }
+  { id: 'title_deep_diver', category: 'title', name: 'Lữ Khách Deep Work', desc: 'Danh hiệu hiển thị trên hồ sơ cho người thích những phiên tập trung sâu.', cost: 180, icon: '🌊' },
+  { id: 'title_timekeeper', category: 'title', name: 'Người Giữ Nhịp Thời Gian', desc: 'Danh hiệu hiển thị trên hồ sơ, không thay đổi chỉ số hay phần thưởng.', cost: 450, icon: '⌛' },
+  { id: 'frame_gold', category: 'frame', name: 'Khung Hào Quang Vàng', desc: 'Viền vàng phát sáng quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 100, icon: '✨', frameClass: 'avatar-frame-gold' },
+  { id: 'frame_neon_cyan', category: 'frame', name: 'Khung Cyber Neon', desc: 'Viền xanh cyan quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 150, icon: '🩵', frameClass: 'avatar-frame-platinum' },
+  { id: 'frame_arcane_purple', category: 'frame', name: 'Khung Ma Thuật Hư Không', desc: 'Viền tím ma thuật quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 250, icon: '🔮', frameClass: 'avatar-frame-master' },
+  { id: 'frame_ocean', category: 'frame', name: 'Khung Đại Dương', desc: 'Ánh xanh lam dịu quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 280, icon: '🌊', frameClass: 'avatar-frame-diamond' },
+  { id: 'frame_sakura', category: 'frame', name: 'Khung Hoa Anh Đào', desc: 'Hào quang hồng quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 320, icon: '🌸', frameClass: 'avatar-frame-grandmaster' },
+  { id: 'frame_rainbow', category: 'frame', name: 'Khung Lăng Kính', desc: 'Hào quang đổi màu quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 550, icon: '🌈', frameClass: 'avatar-frame-challenger' }
 ];
+const MAX_STREAK_FREEZES = 3;
 
 const DEFAULT_STATE = {
   character: {
@@ -47,9 +60,11 @@ const DEFAULT_STATE = {
   gold: 50,
   totalMinutesStudied: 0,
   pomodoroCompleted: 0,
-  streak: 1,
+  streak: 0,
+  streakFreezes: 0,
+  streakProtectedThrough: null,
   streakEarnedToday: null, // ngày YYYY-MM-DD khi streak đã được tích hôm nay
-  lastActiveDate: new Date().toISOString().split('T')[0],
+  lastActiveDate: null,
   activeBuff: null, // { type: 'exp_2x', expiresAt: timestamp }
   inventory: [],
   purchasedItems: [],
@@ -330,39 +345,62 @@ function saveGameState() {
   }
 }
 
+function streakDayNumber(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  const timestamp = Date.UTC(year, month - 1, day);
+  if (new Date(timestamp).toISOString().slice(0, 10) !== value) return null;
+  return timestamp / 86400000;
+}
+
+function normalizeShopState() {
+  const stock = Number(state.streakFreezes);
+  state.streakFreezes = Number.isFinite(stock) ? Math.min(MAX_STREAK_FREEZES, Math.max(0, Math.floor(stock))) : 0;
+  state.purchasedItems = [...new Set((Array.isArray(state.purchasedItems) ? state.purchasedItems : []).filter(id => typeof id === 'string'))];
+}
+
 function checkDailyStreak() {
-  // Streak KHÔNG tự tăng khi mở website.
-  // Streak chỉ được cập nhật khi người dùng hoàn thành ≥30 phút học (gọi từ onTimerCompleted).
-  const today = new Date().toISOString().split('T')[0];
-  if (!state.lastActiveDate) {
-    state.lastActiveDate = today;
-    state.streak = 1;
-  }
-  // Chỉ kiểm tra xem streak có bị gãy không (không hoạt động hơn 1 ngày)
-  const lastDate = new Date(state.lastActiveDate);
-  const todayDate = new Date(today);
-  const diffDays = Math.round((todayDate - lastDate) / 86400000);
-  if (diffDays > 1) {
-    // Gãy streak vì bỏ cách hơn 1 ngày không học
+  normalizeShopState();
+  if (state.streak === 1 && !state.streakEarnedToday && !state.streakProtectedThrough) {
     state.streak = 0;
-    addLog(`💔 Chuỗi cày cấp bị gãy! Hãy hoàn thành ≥30 phút học hôm nay để bắt đầu streak mới.`);
+    state.lastActiveDate = null;
     saveGameState();
+    return true;
   }
-  // Hiển thị note nhắc nhở khi mở website
-  const todayEarned = state.streakEarnedToday || false;
-  if (!todayEarned) {
-    addLog(`ℹ️ Streak hôm nay chưa được tích! Hãy hoàn thành ít nhất 1 phiên ≥30 phút để +1 streak 🔥`);
+  if (!(state.streak > 0)) return false;
+  const today = streakDayNumber(getQuestDay());
+  const lastEarned = streakDayNumber(state.streakEarnedToday) ?? streakDayNumber(state.lastActiveDate);
+  if (lastEarned === null || lastEarned >= today) return false;
+  const protectedDay = streakDayNumber(state.streakProtectedThrough);
+  const coveredThrough = Math.max(lastEarned, protectedDay ?? lastEarned);
+  const missedDays = today - coveredThrough - 1;
+  if (missedDays <= 0) return false;
+  if (state.streakFreezes >= missedDays) {
+    state.streakFreezes -= missedDays;
+    state.streakProtectedThrough = new Date((today - 1) * 86400000).toISOString().slice(0, 10);
+    addLog(`🧊 Tự dùng ${missedDays} viên đóng băng cho ${missedDays} ngày bỏ lỡ. Giữ chuỗi ${state.streak} ngày; còn ${state.streakFreezes} viên.`);
+  } else {
+    state.streak = 0;
+    state.streakProtectedThrough = null;
+    addLog(`💔 Bỏ lỡ ${missedDays} ngày, không đủ viên đóng băng. Chuỗi về 0; giữ lại ${state.streakFreezes} viên. Hoàn thành phiên ≥30 phút để bắt đầu lại.`);
   }
+  saveGameState();
+  return true;
 }
 
 // Hàm này được gọi từ onTimerCompleted khi đủ điều kiện (≥30 phút)
 function earnDailyStreak() {
-  const today = new Date().toISOString().split('T')[0];
+  checkDailyStreak();
+  const today = getQuestDay();
   // Đã tích streak hôm nay rồi thì không tích nữa
   if (state.streakEarnedToday === today) return;
 
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  if (state.lastActiveDate === yesterday || state.lastActiveDate === today) {
+  const todayNumber = streakDayNumber(today);
+  const actualEarned = streakDayNumber(state.streakEarnedToday) ?? streakDayNumber(state.lastActiveDate);
+  const protectedThrough = streakDayNumber(state.streakProtectedThrough);
+  if ((actualEarned !== null && actualEarned > todayNumber) || (protectedThrough !== null && protectedThrough >= todayNumber)) return;
+  const coveredThrough = Math.max(streakDayNumber(state.streakEarnedToday) ?? -Infinity, streakDayNumber(state.streakProtectedThrough) ?? -Infinity, state.streak > 1 ? (streakDayNumber(state.lastActiveDate) ?? -Infinity) : -Infinity);
+  if (state.streak > 0 && coveredThrough >= todayNumber - 1) {
     state.streak = (state.streak || 0) + 1;
     addLog(`🔥 STREAK! Chuỗi cày cấp liên tục: ${state.streak} ngày! Xuất sắc!`);
   } else {
@@ -371,6 +409,7 @@ function earnDailyStreak() {
   }
   state.streakEarnedToday = today;
   state.lastActiveDate = today;
+  state.streakProtectedThrough = null;
   saveGameState();
 }
 
@@ -413,22 +452,8 @@ function getNextRank(level) {
 
 function addExp(amount, sourceText = "", eventX = null, eventY = null) {
   if (amount <= 0) return;
-
-  // Calculate pet multiplier
-  let petMultiplier = 1;
-  if (state.character.pet === 'pet_owl') {
-    petMultiplier += 0.10; // +10% EXP
-  }
-
-  // Calculate buff multiplier
-  let buffMultiplier = 1;
-  if (state.activeBuff && state.activeBuff.type === 'buff_exp_2x') {
-    if (Date.now() < state.activeBuff.expiresAt) {
-      buffMultiplier = 2;
-    } else {
-      state.activeBuff = null;
-    }
-  }
+  const petMultiplier = 1 + (getEquippedPet()?.expBonus || 0);
+  const buffMultiplier = getActiveBoost('expMultiplier');
 
   const finalExp = Math.round(amount * buffMultiplier * petMultiplier);
   state.currentExp += finalExp;
@@ -463,15 +488,18 @@ function addExp(amount, sourceText = "", eventX = null, eventY = null) {
 
   saveGameState();
   renderHUD();
+  return finalExp;
 }
 
 function addGold(amount, eventX = null, eventY = null) {
   if (amount <= 0) return;
+  amount = Math.round(amount * getActiveBoost('goldMultiplier'));
   state.gold += amount;
   sounds.playCoin();
   spawnFloatingText(`+${amount} Vàng`, 'text-yellow-400', eventX, eventY);
   saveGameState();
   renderHUD();
+  return amount;
 }
 
 // ==========================================
@@ -594,7 +622,7 @@ function tickTimer() {
   const newDay = ensureDailyQuests();
   state.dailyFocus.focusSeconds += 1;
   if (currentTimerMode === 'STOPWATCH') state.dailyFocus.stopwatchSeconds += 1;
-  if (newDay) renderQuests();
+  if (newDay) { checkDailyStreak(); renderQuests(); }
   secondsAccumulator++;
 
   // Every 60 seconds of focused study gives +10 EXP and +2 Gold
@@ -604,7 +632,7 @@ function tickTimer() {
     
     // Live accumulation: 10 EXP + 2 Gold per minute
     addExp(10, 'per_minute');
-    addGold(2);
+    addGold(2 + (getEquippedPet()?.perMinuteGold || 0));
 
     // Check if daily quest for focus minutes exists
     checkFocusQuests();
@@ -642,15 +670,12 @@ function onTimerCompleted() {
     checkFocusQuests();
 
     // Additional pet coffee bonus
-    let bonusGold = mode.goldReward;
-    if (state.character.pet === 'pet_coffee') {
-      bonusGold += 5;
-    }
+    const bonusGold = mode.goldReward + (getEquippedPet()?.sessionGold || 0);
 
-    addExp(mode.expReward, 'session_complete');
-    addGold(bonusGold);
+    const awardedExp = addExp(mode.expReward, 'session_complete') ?? mode.expReward;
+    const awardedGold = addGold(bonusGold) ?? bonusGold;
 
-    addLog(`🏆 Hoàn thành trọn vẹn phiên ${mode.label} (+${mode.expReward} EXP, +${bonusGold} Vàng)!`);
+    addLog(`🏆 Hoàn thành trọn vẹn phiên ${mode.label} (+${awardedExp} EXP, +${awardedGold} Vàng)!`);
     triggerConfetti();
 
     // Tích streak nếu phiên học >= 30 phút
@@ -666,7 +691,7 @@ function onTimerCompleted() {
     totalSessionSeconds = timeRemaining;
     updateTimerUI();
 
-    alert(`🎉 XUẤT SẮC! Bạn đã hoàn thành phiên học ${mode.label}.\nNhận ngay +${mode.expReward} EXP và +${bonusGold} Vàng!\nHãy nghỉ ngơi thư giãn ${mode.breakMinutes} phút nào!`);
+    alert(`🎉 XUẤT SẮC! Bạn đã hoàn thành phiên học ${mode.label}.\nNhận ngay +${awardedExp} EXP và +${awardedGold} Vàng!\nHãy nghỉ ngơi thư giãn ${mode.breakMinutes} phút nào!`);
   } else if (timerState === 'BREAK' || isBreakSession) {
     // Finished break
     timerState = 'IDLE';
@@ -879,18 +904,17 @@ function toggleQuest(id, event) {
   const quest = state.quests.find(q => q.id === id);
   if (!quest || quest.timerGoal) return;
 
+  if (quest.completed) quest.rewardClaimed = true;
   quest.completed = !quest.completed;
 
-  if (quest.completed) {
+  if (quest.completed && !quest.rewardClaimed) {
+    quest.rewardClaimed = true;
     sounds.playQuestDone();
     addExp(quest.exp, 'quest', event?.clientX, event?.clientY);
     addGold(quest.gold, event?.clientX, event?.clientY);
     addLog(`⚔️ Hoàn thành nhiệm vụ: "${quest.title}" (+${quest.exp} EXP, +${quest.gold} Vàng)!`);
-  } else {
-    // If unchecked, deduct reward
-    state.currentExp = Math.max(0, state.currentExp - quest.exp);
-    state.gold = Math.max(0, state.gold - quest.gold);
-    addLog(`↩️ Đã hủy hoàn thành nhiệm vụ: "${quest.title}".`);
+  } else if (!quest.completed) {
+    addLog(`↩️ Đánh dấu chưa xong: "${quest.title}". Mỗi nhiệm vụ chỉ nhận thưởng một lần.`);
   }
 
   saveGameState();
@@ -960,106 +984,124 @@ function checkFocusQuests() {
 // 7. RPG SHOP & INVENTORY
 // ==========================================
 
+let shopFilter = 'all';
+const SHOP_CATEGORY_LABELS = { protection: 'Bảo vệ chuỗi', buff: 'Bùa hỗ trợ', pet: 'Bạn đồng hành', title: 'Danh hiệu', frame: 'Khung avatar' };
+
+function getEquippedPet() {
+  if (!Array.isArray(state.purchasedItems) || !state.purchasedItems.includes(state.character.pet)) return null;
+  return SHOP_ITEMS.find(item => item.category === 'pet' && item.id === state.character.pet) || null;
+}
+
+function getActiveBoost(property) {
+  if (!state.activeBuff || Date.now() >= state.activeBuff.expiresAt) return 1;
+  return SHOP_ITEMS.find(item => item.category === 'buff' && item.id === state.activeBuff.type)?.[property] || 1;
+}
+
+function shopMessage(text) {
+  const result = document.getElementById('shop-result');
+  if (result) result.textContent = text;
+}
+
+function setShopFilter(category) {
+  shopFilter = category === 'all' || SHOP_CATEGORY_LABELS[category] ? category : 'all';
+  renderShop();
+}
+
 function renderShop() {
   const container = document.getElementById('shop-items-list');
   if (!container) return;
-
-  container.innerHTML = SHOP_ITEMS.map(item => {
-    const isPurchased = state.purchasedItems.includes(item.id);
-    const isEquipped = 
-      (item.category === 'title' && state.character.title === item.name) ||
-      (item.category === 'frame' && state.character.frame === item.id) ||
-      (item.category === 'pet' && state.character.pet === item.id);
-    const canAfford = state.gold >= item.cost;
-
-    let buttonHtml = '';
-    if (item.category === 'buff') {
-      const isBuffActive = state.activeBuff && state.activeBuff.type === item.id && Date.now() < state.activeBuff.expiresAt;
-      if (isBuffActive) {
-        const remainingMin = Math.ceil((state.activeBuff.expiresAt - Date.now()) / 60000);
-        buttonHtml = `<button disabled class="w-full py-2 px-3 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Đang kích hoạt (${remainingMin}p)</button>`;
-      } else {
-        buttonHtml = `<button onclick="buyShopItem('${item.id}')" ${!canAfford ? 'disabled' : ''} class="w-full py-2 px-3 rounded-lg text-xs font-bold ${canAfford ? 'bg-yellow-500 hover:bg-yellow-400 text-slate-950 shadow-md shadow-yellow-500/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition-all">Mua ngay (${item.cost} 🪙)</button>`;
-      }
-    } else {
-      // Permanent item / title / frame / pet
-      if (isEquipped) {
-        buttonHtml = `<button disabled class="w-full py-2 px-3 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Đang trang bị</button>`;
-      } else if (isPurchased) {
-        buttonHtml = `<button onclick="equipShopItem('${item.id}')" class="w-full py-2 px-3 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-all">Trang bị</button>`;
-      } else {
-        buttonHtml = `<button onclick="buyShopItem('${item.id}')" ${!canAfford ? 'disabled' : ''} class="w-full py-2 px-3 rounded-lg text-xs font-bold ${canAfford ? 'bg-yellow-500 hover:bg-yellow-400 text-slate-950 shadow-md shadow-yellow-500/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} transition-all">Mua (${item.cost} 🪙)</button>`;
-      }
-    }
-
-    return `
-      <div class="rpg-card p-4 rounded-xl flex flex-col justify-between border border-slate-700/60 hover:border-slate-500 transition-all">
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-3xl">${item.icon}</span>
-            <span class="text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/20 flex items-center gap-1">
-              ${item.cost} <span>🪙</span>
-            </span>
-          </div>
-          <h4 class="text-sm font-bold text-slate-100 mb-1">${escapeHtml(item.name)}</h4>
-          <p class="text-xs text-slate-400 line-clamp-2 mb-4">${escapeHtml(item.desc)}</p>
-        </div>
-        <div>
-          ${buttonHtml}
-        </div>
-      </div>
-    `;
+  normalizeShopState();
+  for (const [id, value] of [['shop-freeze-count', state.streakFreezes], ['shop-streak-count', state.streak]]) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+  document.querySelectorAll('[data-shop-filter]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.shopFilter === shopFilter)));
+  const equippedList = document.getElementById('shop-equipped-list');
+  if (equippedList) {
+    equippedList.innerHTML = ['pet', 'title', 'frame'].map(category => {
+      const item = SHOP_ITEMS.find(entry => entry.category === category && (category === 'title' ? entry.name === state.character.title : entry.id === state.character[category]));
+      const name = item?.name || (category === 'title' ? state.character.title : category === 'frame' ? 'Khung theo rank' : 'Chưa có bạn đồng hành');
+      return `<div class="rounded-xl border border-slate-700/60 bg-slate-900/60 p-3 min-w-0"><p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">${SHOP_CATEGORY_LABELS[category]}</p><p class="text-xs font-semibold text-slate-200 break-words">${item?.icon || '◇'} ${escapeHtml(name)}</p>${item ? `<button type="button" data-unequip="${category}" onclick="unequipShopCategory('${category}')" class="text-xs text-indigo-300 hover:text-white mt-2">Tháo trang bị</button>` : ''}</div>`;
+    }).join('');
+  }
+  const activeBuff = state.activeBuff && Date.now() < state.activeBuff.expiresAt;
+  const visibleItems = SHOP_ITEMS.filter(item => shopFilter === 'all' || item.category === shopFilter);
+  container.innerHTML = visibleItems.map(item => {
+    const purchased = state.purchasedItems.includes(item.id);
+    const equipped = (item.category === 'title' && state.character.title === item.name) ||
+      (item.category === 'frame' && state.character.frame === item.id) || (item.category === 'pet' && state.character.pet === item.id);
+    let label, action = `buyShopItem('${item.id}')`, disabled = false;
+    if (item.category === 'protection' && state.streakFreezes >= MAX_STREAK_FREEZES) { label = 'Kho đã đầy · 3/3 viên'; disabled = true; }
+    else if (item.category === 'buff' && activeBuff) {
+      label = state.activeBuff.type === item.id ? `Đang dùng · ${Math.ceil((state.activeBuff.expiresAt - Date.now()) / 60000)} phút` : 'Đợi bùa hiện tại kết thúc'; disabled = true;
+    } else if (equipped && purchased) { label = 'Đang trang bị'; disabled = true; }
+    else if (purchased && !['buff', 'protection'].includes(item.category)) { label = 'Trang bị'; action = `equipShopItem('${item.id}')`; }
+    else if (state.gold < item.cost) { label = `Cần thêm ${item.cost - state.gold} vàng`; disabled = true; }
+    else { label = item.category === 'protection' ? `Mua 1 viên · ${item.cost} 🪙` : `Mua · ${item.cost} 🪙`; }
+    const ownedLabel = item.category === 'protection' ? `Trong túi: ${state.streakFreezes}/${MAX_STREAK_FREEZES}` : item.category === 'buff' ? 'Dùng ngay khi mua' : purchased ? 'Đã sở hữu · dùng lâu dài' : 'Mua một lần · dùng lâu dài';
+    return `<article data-shop-item="${item.id}" data-shop-category="${item.category}" class="rpg-card p-5 rounded-2xl flex flex-col justify-between border ${item.category === 'protection' ? 'border-cyan-500/50 bg-cyan-950/10' : 'border-slate-700/60'} gap-4">
+      <div><div class="flex items-center justify-between gap-2 mb-3"><span class="text-3xl" aria-hidden="true">${item.icon}</span><span class="text-xs font-bold text-yellow-400 bg-yellow-400/10 px-2.5 py-1 rounded-full">${item.cost} 🪙</span></div>
+      <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">${SHOP_CATEGORY_LABELS[item.category]}</p><h4 class="text-sm font-bold text-slate-100 mb-2">${escapeHtml(item.name)}</h4><p class="text-xs leading-relaxed text-slate-400">${escapeHtml(item.desc)}</p></div>
+      <div><p class="text-[11px] text-slate-500 mb-2">${ownedLabel}</p><button type="button" data-shop-buy="${item.id}" onclick="${action}" ${disabled ? 'disabled' : ''} class="w-full py-2.5 px-3 rounded-xl text-xs font-bold ${disabled ? 'bg-slate-800 text-slate-400 cursor-not-allowed' : purchased && item.category !== 'protection' && item.category !== 'buff' ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-yellow-500 hover:bg-yellow-400 text-slate-950'} transition-all">${label}</button></div></article>`;
   }).join('');
 }
 
 function buyShopItem(itemId) {
-  const item = SHOP_ITEMS.find(i => i.id === itemId);
-  if (!item) return;
-
-  if (state.gold < item.cost) {
-    alert("Bạn chưa đủ Vàng! Hãy hoàn thành thêm Pomodoro hoặc nhiệm vụ để tích lũy vàng nhé.");
-    return;
+  const item = SHOP_ITEMS.find(entry => entry.id === itemId);
+  if (!item) return false;
+  checkDailyStreak();
+  normalizeShopState();
+  renderHUD();
+  if (!['buff', 'protection'].includes(item.category) && state.purchasedItems.includes(item.id)) {
+    equipShopItem(item.id); return false;
   }
-
+  if (item.category === 'protection' && state.streakFreezes >= MAX_STREAK_FREEZES) {
+    shopMessage('Bạn đã có đủ 3 viên đóng băng. Hãy dùng bớt trước khi mua thêm.'); return false;
+  }
+  if (item.category === 'buff' && state.activeBuff && Date.now() < state.activeBuff.expiresAt) {
+    shopMessage('Bạn đang dùng một bùa hỗ trợ. Đợi bùa này kết thúc để không mất thời gian hiệu lực.'); return false;
+  }
+  if (!Number.isFinite(state.gold) || state.gold < item.cost) {
+    shopMessage('Chưa đủ vàng. Hoàn thành timer và nhiệm vụ để tích lũy thêm nhé.'); return false;
+  }
   state.gold -= item.cost;
-
-  if (item.category === 'buff') {
-    const expiresAt = Date.now() + (item.durationMinutes * 60 * 1000);
-    state.activeBuff = {
-      type: item.id,
-      name: item.name,
-      expiresAt: expiresAt
-    };
-    addLog(`✨ Đã kích hoạt ${item.name}! Hiệu lực trong ${item.durationMinutes} phút.`);
+  if (item.category === 'protection') {
+    state.streakFreezes += 1;
+    addLog(`🧊 Mua 1 viên đóng băng streak (${item.cost} vàng). Trong túi: ${state.streakFreezes}/${MAX_STREAK_FREEZES}.`);
+    shopMessage('Đã cất 1 viên đóng băng vào túi. Viên sẽ tự dùng cho ngày bỏ lỡ khi đủ số lượng bảo vệ chuỗi.');
+  } else if (item.category === 'buff') {
+    state.activeBuff = { type: item.id, name: item.name, expiresAt: Date.now() + item.durationMinutes * 60000 };
+    addLog(`✨ Kích hoạt ${item.name} trong ${item.durationMinutes} phút.`);
+    shopMessage(`Đã kích hoạt ${item.name}. Thời gian hiệu lực bắt đầu ngay.`);
     triggerConfetti();
   } else {
     state.purchasedItems.push(item.id);
     equipShopItem(item.id);
-    addLog(`🛒 Đã sở hữu và trang bị: ${item.name}!`);
+    addLog(`🛒 Đã mua và trang bị ${item.name} (${item.cost} vàng).`);
+    shopMessage(`Đã sở hữu và trang bị ${item.name}. Có thể đổi hoặc tháo miễn phí.`);
   }
-
   sounds.playCoin();
-  saveGameState();
-  renderHUD();
-  renderShop();
+  saveGameState(); renderHUD(); renderShop();
+  return true;
 }
 
 function equipShopItem(itemId) {
-  const item = SHOP_ITEMS.find(i => i.id === itemId);
-  if (!item) return;
-
-  if (item.category === 'title') {
-    state.character.title = item.name;
-  } else if (item.category === 'frame') {
-    state.character.frame = item.id;
-  } else if (item.category === 'pet') {
-    state.character.pet = item.id;
-  }
-
-  saveGameState();
-  renderHUD();
-  renderShop();
+  normalizeShopState();
+  const item = SHOP_ITEMS.find(entry => entry.id === itemId);
+  if (!item || !state.purchasedItems.includes(itemId) || !['pet', 'title', 'frame'].includes(item.category)) return false;
+  state.character[item.category] = item.category === 'title' ? item.name : item.id;
+  saveGameState(); renderHUD(); renderShop();
+  shopMessage(`Đã trang bị ${item.name}.`);
+  return true;
 }
+
+function unequipShopCategory(category) {
+  if (!['pet', 'title', 'frame'].includes(category)) return;
+  state.character[category] = DEFAULT_STATE.character[category];
+  saveGameState(); renderHUD(); renderShop();
+  shopMessage('Đã tháo trang bị. Vật phẩm vẫn thuộc sở hữu của bạn.');
+}
+
 
 // ==========================================
 // 8. RANK SHOWROOM & MILESTONES
@@ -1127,23 +1169,14 @@ function renderHUD() {
   if (avatarEl) avatarEl.innerText = state.character.avatar;
 
   if (avatarContainer) {
-    // Reset frame classes
-    avatarContainer.className = `w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-all relative ${currentRank.frameClass}`;
-    if (state.character.frame === 'frame_neon_cyan') {
-      avatarContainer.className += ' avatar-frame-platinum';
-    } else if (state.character.frame === 'frame_arcane_purple') {
-      avatarContainer.className += ' avatar-frame-master';
-    } else if (state.character.frame === 'frame_gold') {
-      avatarContainer.className += ' avatar-frame-gold';
-    }
+    const equippedFrame = SHOP_ITEMS.find(item => item.category === 'frame' && item.id === state.character.frame && state.purchasedItems.includes(item.id));
+    avatarContainer.className = `w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-all relative ${equippedFrame?.frameClass || currentRank.frameClass}`;
   }
 
   if (petBadgeEl) {
-    if (state.character.pet === 'pet_owl') {
-      petBadgeEl.innerText = '🦉';
-      petBadgeEl.classList.remove('hidden');
-    } else if (state.character.pet === 'pet_coffee') {
-      petBadgeEl.innerText = '☕';
+    const pet = getEquippedPet();
+    if (pet) {
+      petBadgeEl.innerText = pet.icon;
       petBadgeEl.classList.remove('hidden');
     } else {
       petBadgeEl.classList.add('hidden');
@@ -1184,6 +1217,10 @@ function renderHUD() {
   if (goldEl) goldEl.innerText = state.gold.toLocaleString();
   if (shopBalanceEl) shopBalanceEl.innerText = state.gold.toLocaleString();
   if (streakEl) streakEl.innerText = `${state.streak} ngày`;
+  for (const [id, count] of [['streak-freeze-count', state.streakFreezes || 0], ['shop-freeze-count', state.streakFreezes || 0], ['shop-streak-count', state.streak || 0], ['stat-streak-count', state.streak || 0]]) {
+    const counter = document.getElementById(id);
+    if (counter) counter.textContent = count;
+  }
   if (totalMinutesEl) totalMinutesEl.innerText = `${state.totalMinutesStudied}p`;
   if (statTotalTimeEl) statTotalTimeEl.innerText = `${state.totalMinutesStudied}p`;
   if (pomodoroCountEl) pomodoroCountEl.innerText = state.pomodoroCompleted;
@@ -1495,9 +1532,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Auto check buff expiry every minute
   setInterval(() => {
+    checkDailyStreak();
     if (ensureDailyQuests()) { saveGameState(); renderQuests(); }
     checkBuffExpiration();
     renderHUD();
+    const shopTab = document.getElementById('tab-shop');
+    if (shopTab && !shopTab.classList.contains('hidden')) renderShop();
   }, 30000);
 
   window.CloudSave?.init({

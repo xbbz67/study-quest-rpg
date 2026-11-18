@@ -1,3 +1,13 @@
+## Shop và bảo vệ streak
+
+Shop có 22 vật phẩm, chia nhóm bảo vệ chuỗi, bùa hỗ trợ, bạn đồng hành, danh hiệu và khung avatar. Vật phẩm vĩnh viễn mua một lần, được trang bị/tháo miễn phí; chỉ dùng một bùa và một bạn đồng hành mỗi lần.
+
+- Đóng băng streak: 120 vàng/viên, tối đa 3 viên. Tự bảo vệ các ngày đã kết thúc mà không học; phải mua trước khi chuỗi bị gãy. Không tiêu viên cho hôm nay khi ngày chưa kết thúc và không cộng ngày streak cho ngày đóng băng.
+- Nếu cả khoảng nghỉ dài hơn số viên sẵn có, streak về 0 nhưng không tiêu các viên đó. Hoàn thành một phiên đếm ngược từ 30 phút để kiếm một ngày streak, tối đa một lần/ngày. Ngày tính theo giờ trên máy, nhất quán với nhiệm vụ hàng ngày.
+- Kho đóng băng và ngày đã bảo vệ nằm trong dữ liệu tiến độ của tài khoản, đồng bộ cloud cùng vàng và trang bị. Kiểm tra khi tải/mở trang, qua ngày mới và trước khi mua/nhận streak.
+- Bùa EXP có các mốc 15/30/60 phút; bùa vàng nhân đôi phần thưởng từ timer và nhiệm vụ, không nhân vàng lên cấp. Thú mới gồm cáo (+1 vàng/phút), mèo (+5% EXP, +2 vàng/phiên) và rồng (+15% EXP).
+- Nhiệm vụ tự tạo chỉ nhận phần thưởng một lần; có thể bỏ dấu hoàn thành nhưng không nhận lại thưởng khi tích lại.
+
 ## Tài khoản và đồng bộ cloud
 
 Bản triển khai dùng Supabase Auth (email/mật khẩu) và bảng `study_progress` để giữ tiến độ trên nhiều máy. Chọn **Đăng nhập** trên website; tài khoản mới sẽ được hỏi trước khi chuyển tiến độ local lên cloud. Tài khoản đã có dữ liệu sẽ tải bản cloud. Tiến độ khách và từng tài khoản được lưu riêng trên máy.

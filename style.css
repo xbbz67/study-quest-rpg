@@ -266,6 +266,125 @@ body.meme-focus-mode {
   backdrop-filter: blur(8px);
 }
 
+/* Shop: protection feature, equipment slots and category controls. */
+.shop-freeze-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(103, 232, 249, .25);
+  border-radius: 1.25rem;
+  background: linear-gradient(120deg, rgba(8, 145, 178, .16), rgba(30, 41, 59, .6) 60%, rgba(79, 70, 229, .14));
+}
+
+.shop-feature-eyebrow {
+  margin-bottom: .65rem;
+  font-size: .625rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  color: #67e8f9;
+}
+
+.shop-freeze-copy h4 {
+  margin-bottom: .65rem;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.35;
+  color: #ecfeff;
+}
+
+.shop-freeze-copy p {
+  max-width: 46rem;
+  font-size: .8rem;
+  line-height: 1.75;
+  color: #cbd5e1;
+}
+
+.shop-freeze-copy .shop-freeze-detail {
+  margin-top: .65rem;
+  font-size: .7rem;
+  color: #94a3b8;
+}
+
+.shop-freeze-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1rem;
+  padding: .65rem .9rem;
+  border: 1px solid rgba(103, 232, 249, .3);
+  border-radius: .75rem;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #a5f3fc;
+  background: rgba(8, 145, 178, .12);
+  transition: background .15s ease;
+}
+
+.shop-freeze-link:hover { background: rgba(8, 145, 178, .24); }
+
+.shop-freeze-stats {
+  align-self: center;
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(103, 232, 249, .15);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, .4);
+}
+
+.shop-freeze-stat-label {
+  font-size: .625rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: #94a3b8;
+}
+
+.shop-freeze-stat-number {
+  margin-top: .3rem;
+  font-family: var(--font-mono);
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #67e8f9;
+}
+
+.shop-freeze-stat-unit { font-size: .75rem; font-weight: 500; color: #94a3b8; }
+.shop-freeze-current { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid rgba(148, 163, 184, .15); }
+.shop-freeze-streak { color: #fda4af; }
+.shop-freeze-note { display: block; margin-top: .65rem; font-size: .625rem; line-height: 1.5; color: #64748b; }
+.shop-equipped-section { margin-bottom: 1.75rem; }
+
+.shop-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.shop-filter-btn {
+  padding: .55rem .85rem;
+  border: 1px solid #334155;
+  border-radius: .75rem;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, .7);
+  font-size: .7rem;
+  font-weight: 700;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.shop-filter-btn:hover { color: #e2e8f0; border-color: #64748b; }
+.shop-filter-btn[aria-pressed="true"] { color: #e0e7ff; border-color: #6366f1; background: rgba(79, 70, 229, .25); }
+.shop-filter-btn:focus-visible, .shop-freeze-link:focus-visible { outline: 2px solid #a5b4fc; outline-offset: 3px; }
+.shop-result { min-height: 1.25rem; margin: .6rem 0; color: #a5f3fc; font-size: .75rem; line-height: 1.65; }
+
+@media (max-width: 639px) {
+  .shop-freeze-feature { grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1rem; }
+  .shop-freeze-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding: 1rem; }
+  .shop-freeze-current { margin: 0; padding: 0 0 0 .75rem; border-top: 0; border-left: 1px solid rgba(148, 163, 184, .15); }
+  .shop-freeze-stat-number { font-size: 1.35rem; }
+  .shop-freeze-note { grid-column: 1 / -1; margin-top: 0; }
+  .shop-filter-btn { padding: .5rem .65rem; }
+}
+
 /* Keep Zen content in normal document flow so music never covers the timer. */
 #cloud-dialog {
   width: min(92vw, 28rem);

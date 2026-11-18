@@ -8,6 +8,11 @@ window.CloudSave = (() => {
   const accountKey = id => `${ROOT_KEY}:account:${id}`;
   const metaKey = id => `${ROOT_KEY}:sync:${id}`;
   const clone = value => JSON.parse(JSON.stringify(value));
+  function canonical(value) {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])]));
+    return value;
+  }
   function stored(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
   function remember() {
     if (user) localStorage.setItem(metaKey(user.id), JSON.stringify({ revision, dirty }));
@@ -49,6 +54,7 @@ window.CloudSave = (() => {
   function apply(payload, key) {
     applying = true;
     try { bridge.apply(payload, key); } finally { applying = false; }
+    return JSON.stringify(canonical(bridge.snapshot())) !== JSON.stringify(canonical(payload));
   }
   async function readRemote() {
     const { data, error } = await client.from('study_progress').select('payload,revision,updated_at').eq('user_id', user.id).maybeSingle();
@@ -90,8 +96,8 @@ window.CloudSave = (() => {
           const hasProgress = guest && (guest.level > 1 || guest.totalMinutesStudied > 0 || guest.quests?.some(q => !q.isDaily));
           if (hasProgress && confirm('Tài khoản chưa có tiến độ cloud. Chuyển tiến độ đang có trên máy này lên tài khoản? Bản local vẫn được giữ.')) payload = guest;
         }
-        apply(payload, accountKey(user.id));
-        dirty = !remote; ready = true; lock(false);
+        const normalized = apply(payload, accountKey(user.id));
+        dirty = !remote || normalized; ready = true; lock(false);
       }
       remember();
       if (dirty) await flush(); else status('Đã đồng bộ cloud');
@@ -99,7 +105,8 @@ window.CloudSave = (() => {
       if (epoch !== generation) return;
       if (cache) {
         revision = meta.revision || 0; dirty = !!meta.dirty;
-        apply(cache, accountKey(user.id)); ready = true; lock(false);
+        const normalized = apply(cache, accountKey(user.id));
+        dirty = dirty || normalized; remember(); ready = true; lock(false);
         status('Đang dùng bản trên máy · chờ kết nối');
       } else {
         // Do not overwrite the existing remote save with a new empty game on a network failure.
@@ -171,8 +178,9 @@ window.CloudSave = (() => {
       // Keep a recovery copy even when the user chooses not to download one.
       localStorage.setItem(`${accountKey(user.id)}:before-cloud`, JSON.stringify(bridge.snapshot()));
       revision = remote.revision; dirty = false; conflict = false;
-      apply(remote.payload, accountKey(user.id)); remember(); ready = true; lock(false);
-      paint(); message('Đã tải tiến độ từ cloud.'); status('Đã đồng bộ cloud');
+      dirty = apply(remote.payload, accountKey(user.id)); remember(); ready = true; lock(false);
+      paint(); message('Đã tải tiến độ từ cloud.');
+      if (dirty) await flush(); else status('Đã đồng bộ cloud');
     } catch (error) { message(readable(error)); }
   }
   async function authenticate(kind) {

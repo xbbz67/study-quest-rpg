@@ -1,3 +1,9 @@
+## Nhân vật 3D và cửa Theater
+
+Theater dựng nhân vật 3D bằng Three.js 0.180.0 (thư viện và giấy phép MIT trong `assets/three/`). Khi chọn ghế, ghế được giữ trên cloud trước rồi nhân vật bước từ IN, qua lối giữa, tới chỗ ngồi. Cửa IN tự chọn ghế trống. Cửa EXIT giải phóng ghế, chờ nhân vật đứng dậy đi ra rồi trở về timer; nút Rời ghế vẫn cho phép ở lại xem phòng. Chuyển tab khác sẽ dọn mô hình và giải phóng ghế ngay.
+
+Người đã ngồi trong phòng khi bạn mở Theater được hiển thị ở ghế sẵn. Người vừa vào/rời được hoạt họa theo lần cập nhật ghế; danh sách ghế hiện cập nhật mỗi 10 giây, không phải chuyển động đồng bộ từng khung hình. Thiết bị không hỗ trợ WebGL2 giữ hình người 2D. Chế độ giảm chuyển động của hệ điều hành bỏ hoạt họa di chuyển. Bộ dựng dừng khi nhân vật ngồi yên và được giải phóng khi đóng Theater.
+
 ## Theater
 
 Tab Theater có phòng chung 48 ghế, 6 dãy A–F, và màn hình riêng nhận link HTTPS YouTube video/playlist hoặc Spotify track/playlist/album/episode/show/artist. Dùng player nhúng chính thức; người dùng bấm Play. Nội dung phát riêng mỗi máy, chưa đồng bộ phát cho cả phòng. Một số video bị chủ nội dung chặn nhúng; dùng liên kết Mở bản gốc nếu cần. Spotify có thể yêu cầu đăng nhập hoặc chỉ cho nghe thử tùy nội dung/tài khoản.

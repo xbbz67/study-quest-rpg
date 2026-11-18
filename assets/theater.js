@@ -1,6 +1,6 @@
 window.Theater = (() => {
  const el=id=>document.getElementById(id);
- let active=false, rows=[], seat=null, account=null, connected=false, busy=false, polling=null, lastBeat=0, epoch=0, refreshNumber=0, releasePending=Promise.resolve();
+ let active=false, rows=[], seat=null, account=null, connected=false, busy=false, polling=null, lastBeat=0, epoch=0, refreshNumber=0, releasePending=Promise.resolve(),doorBusy=false,sceneLoader=null;
  const say=text=>{if(el('theater-status'))el('theater-status').textContent=text;};
  function parseMediaLink(text){
   let url;try{url=new URL(text.trim());}catch{return null;}
@@ -40,12 +40,15 @@ window.Theater = (() => {
   const map=new Map(rows.map(row=>[row.seat,row]));
   el('theater-seats').innerHTML='ABCDEF'.split('').map(letter=>`<div class="theater-seat-row"><span class="theater-row-label">${letter}</span><div class="theater-seat-grid">${Array.from({length:8},(_,i)=>{
    const id=letter+(i+1),occupant=map.get(id),mine=occupant?.user_id===account;
-   return `<button type="button" data-seat="${id}" data-seat-occupied="${!!occupant}" class="theater-seat ${mine?'is-mine':occupant?'is-occupied':''}" aria-label="Ghế ${id}${occupant?': '+escapeHtml(occupant.display_name)+(mine?' (bạn)':''):': còn trống'}" title="${occupant?escapeHtml(occupant.display_name):'Chọn ghế '+id}" aria-pressed="${mine}" ${!connected||!account||busy||(occupant&&!mine)?'disabled':''}>${occupant?personAvatar(occupant.display_name,occupant.user_id,mine):''}<span class="theater-seat-code">${id}</span>${occupant?`<span class="theater-seat-name">${mine?'Bạn':escapeHtml(occupant.display_name)}</span>`:''}${mine?'<span class="theater-you-marker" aria-hidden="true">▼</span>':''}</button>`;
+   return `<button type="button" data-seat="${id}" data-seat-occupied="${!!occupant}" class="theater-seat ${mine?'is-mine':occupant?'is-occupied':''}" aria-label="Ghế ${id}${occupant?': '+escapeHtml(occupant.display_name)+(mine?' (bạn)':''):': còn trống'}" title="${occupant?escapeHtml(occupant.display_name):'Chọn ghế '+id}" aria-pressed="${mine}" ${!connected||!account||busy||doorBusy||(occupant&&!mine)?'disabled':''}>${occupant?personAvatar(occupant.display_name,occupant.user_id,mine):''}<span class="theater-seat-code">${id}</span>${occupant?`<span class="theater-seat-name">${mine?'Bạn':escapeHtml(occupant.display_name)}</span>`:''}${mine?'<span class="theater-you-marker" aria-hidden="true">▼</span>':''}</button>`;
   }).join('')}</div></div>`).join('');
   el('theater-occupancy').textContent=`${rows.length}/48 ghế`;
-  el('theater-my-seat').textContent=seat?`Bạn đang ngồi ghế ${seat}`:'Chọn một ghế để ngồi học';
+  el('theater-my-seat').textContent=seat?`Ghế của bạn: ${seat}`:'Chọn một ghế để ngồi học';
   el('theater-people').textContent=rows.length?rows.map(row=>`${row.seat} · ${row.display_name}`).join('   /   '):'Chưa có người ngồi trong phòng.';
-  el('theater-leave-seat').disabled=!seat||busy;
+  el('theater-leave-seat').disabled=!seat||busy||doorBusy;
+  el('theater-door-in').disabled=busy||doorBusy;
+  el('theater-door-exit').disabled=busy||doorBusy;
+  window.Theater3D?.sync(rows,account,{confirmed:connected});
  }
  async function chooseSeat(id){
   const client=window.CloudSave?.getClient(),user=window.CloudSave?.getUser();
@@ -55,7 +58,7 @@ window.Theater = (() => {
   try{
    const {error}=await client.rpc('choose_theater_seat',{chosen_seat:id,nickname:String(state.character.name||'Bạn học').slice(0,40)});
    if(error){say(error.code==='PT409'?'Ghế vừa có người chọn. Bạn chọn ghế khác nhé.':'Chưa giữ được ghế. Kiểm tra kết nối rồi thử lại.');return false;}
-   seat=id;lastBeat=Date.now();say(id?`Đã vào ghế ${id}. Chúc bạn một phiên học tốt!`:'Đã rời ghế.');return true;
+   seat=id;lastBeat=Date.now();say(id?`Đã giữ ghế ${id} cho bạn. Chúc bạn một phiên học tốt!`:'Đã rời ghế.');return true;
   }catch{say('Mất kết nối phòng học. Timer vẫn hoạt động trên máy.');return false;}
   finally{busy=false;await refresh();}
  }
@@ -67,7 +70,7 @@ window.Theater = (() => {
  async function refresh(){
   if(!active)return;
   const user=window.CloudSave?.getUser(),client=window.CloudSave?.getClient(),currentEpoch=epoch,request=++refreshNumber;
-  if(!user||!client){account=null;rows=[];seat=null;connected=false;renderSeats();say('Bạn có thể xem và chạy timer. Đăng nhập để chọn ghế và thấy người trong phòng.');return;}
+  if(!user||!client){account=null;rows=[];seat=null;connected=false;window.Theater3D?.stop();renderSeats();say('Bạn có thể xem và chạy timer. Đăng nhập để chọn ghế và thấy người trong phòng.');return;}
   if(account!==user.id){account=user.id;seat=null;}
   try{
    if(seat&&!busy&&Date.now()-lastBeat>30000){
@@ -92,13 +95,30 @@ window.Theater = (() => {
   if(active)return;active=true;epoch++;document.body.classList.add('theater-active');
   sounds.stopAmbient();
   document.getElementById('lofi-iframe')?.contentWindow?.postMessage(JSON.stringify({event:'command',func:'pauseVideo',args:[]}),'https://www.youtube.com');
-  connected=false;renderSeats();renderTimer();void releasePending.then(()=>refresh());polling=setInterval(()=>{void refresh();},10000);
+  connected=false;renderSeats();renderTimer();
+  sceneLoader ||= import('./theater-3d.js').catch(()=>{el('theater-motion-status').textContent='Đang dùng nhân vật 2D; có thể tải lại trang để mở 3D.';});
+  void sceneLoader.then(()=>{if(active)window.Theater3D?.sync(rows,account,{confirmed:connected});});
+  void releasePending.then(()=>refresh());polling=setInterval(()=>{void refresh();},10000);
  }
  function leave(){
-  if(!active)return;active=false;epoch++;connected=false;clearInterval(polling);document.body.classList.remove('theater-active');releasePending=releaseSeat();
+  if(!active)return;active=false;epoch++;connected=false;clearInterval(polling);document.body.classList.remove('theater-active');releasePending=releaseSeat();window.Theater3D?.stop();
   el('theater-screen').replaceChildren();el('theater-external').hidden=true;
  }
  document.addEventListener('DOMContentLoaded',()=>{
+  el('theater-door-in').addEventListener('click',()=>{
+   if(!account){el('cloud-account-button').click();return;}
+   if(!connected){say('Đang kết nối phòng. Thử lại sau một chút nhé.');return;}
+   if(seat){say(`Bạn đã ngồi ghế ${seat}.`);return;}
+   const taken=new Set(rows.map(row=>row.seat)),available='ABCDEF'.split('').flatMap(letter=>Array.from({length:8},(_,i)=>letter+(i+1))).find(id=>!taken.has(id));
+   if(available)void chooseSeat(available);else say('Phòng đã đủ 48 ghế. Bạn có thể tiếp tục xem màn hình và dùng timer.');
+  });
+  el('theater-door-exit').addEventListener('click',async()=>{
+   if(busy||doorBusy)return;
+   if(!seat){switchTab('tab-timer');return;}
+   doorBusy=true;const id=account;renderSeats();
+   try{if(await chooseSeat(null)){say('Đang đi ra cửa EXIT…');await window.Theater3D?.waitForExit(id);if(active)switchTab('tab-timer');}}
+   finally{doorBusy=false;renderSeats();}
+  });
   el('theater-media-form').addEventListener('submit',event=>{event.preventDefault();loadMedia();});
   el('theater-stop-media').addEventListener('click',()=>{el('theater-screen').replaceChildren();el('theater-external').hidden=true;el('theater-media-status').textContent='Đã tắt màn hình.';});
   el('theater-seats').addEventListener('click',event=>{const button=event.target.closest('[data-seat]');if(button&&!button.disabled)void chooseSeat(button.dataset.seat);});

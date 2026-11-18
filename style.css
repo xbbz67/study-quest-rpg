@@ -670,3 +670,22 @@ body.zen-active {
 
 #theater-screen{min-height:200px}#theater-screen[data-provider="Spotify"]{aspect-ratio:auto;height:352px}
 @media(max-width:600px){.theater-seat{height:2.9rem}.theater-person{width:2.1rem;height:3rem;top:-.65rem}.theater-seat-name{font-size:.46rem;bottom:-1rem}.theater-seat-code{font-size:.48rem}.theater-you-marker{top:-1.3rem}}
+
+.theater-floor{position:relative;min-width:0;padding-top:1.25rem}
+.theater-3d-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.theater-floor[data-scene="3d"] .theater-person{visibility:hidden}
+.theater-doors{position:relative;display:flex;justify-content:space-between;align-items:end;gap:.75rem;padding:2rem .5rem .5rem;min-height:9rem}
+.theater-door{position:relative;z-index:5;display:flex;align-items:center;flex-direction:column;gap:.4rem;flex:0 0 4.5rem;background:none;border:0;cursor:pointer;color:#b5e9cd}
+.theater-door:disabled{cursor:wait;opacity:.6}
+.theater-door-sign{font-size:.65rem;font-weight:900;letter-spacing:.13em;padding:.15rem .6rem;background:#173d2f;border:1px solid #8ed7ae66;border-radius:.25rem;box-shadow:0 0 15px #5ef5981c}
+.theater-door-frame{position:relative;display:block;width:3.5rem;height:4.4rem;perspective:150px;border:3px solid #5c5542;border-bottom:4px solid #9e865b;background:linear-gradient(#74947b,#24392e);box-shadow:inset 0 0 12px #0009,0 3px 12px #0008}
+.theater-door-leaf{position:absolute;inset:0;display:block;background:linear-gradient(90deg,#67543d,#3f3228);border:1px solid #8c7352;transform-origin:left center;transition:transform .45s ease;backface-visibility:visible}
+.theater-door-leaf:after{content:'';position:absolute;right:.3rem;top:50%;width:4px;height:9px;border-radius:2px;background:#cfb77a}
+.theater-door-caption{font-size:.58rem;font-weight:700;color:#c3b7a2}
+.theater-door-exit{color:#ffdb9f}.theater-door-exit .theater-door-sign{background:#483321;border-color:#d8b77a66}
+.theater-floor[data-entering="true"] #theater-door-in .theater-door-leaf,.theater-door-in:hover .theater-door-leaf{transform:rotateY(-65deg)}
+.theater-floor[data-exiting="true"] #theater-door-exit .theater-door-leaf,.theater-door-exit:hover .theater-door-leaf{transform:rotateY(-65deg)}
+#theater-motion-status{font-size:.6rem;line-height:1.7;color:#a39b8c;text-align:center;max-width:17rem;align-self:center}
+.theater-door:focus-visible{outline:2px solid #a7f3d0;outline-offset:5px;border-radius:.5rem}
+@media(max-width:600px){.theater-doors{padding-top:1.5rem;gap:.4rem}.theater-door{flex-basis:3.5rem}.theater-door-frame{width:2.7rem;height:3.7rem}#theater-motion-status{font-size:.52rem}.theater-door-sign{font-size:.55rem;padding:.15rem .35rem}}
+@media(prefers-reduced-motion:reduce){.theater-door-leaf{transition:none}}

@@ -82,7 +82,7 @@
 
         <!-- Daily Streak Counter -->
         <div class="flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-xl text-rose-400 font-bold text-xs shadow-inner" title="Chuỗi cày cấp liên tục">
-          <span>🔥</span>
+          <span id="streak-tree-icon" aria-hidden="true">🌰</span>
           <span id="streak-count" class="font-mono">0 ngày</span>
           <span class="ml-1 pl-2 border-l border-rose-500/20 text-cyan-300" title="Đóng băng streak có sẵn: tự bảo vệ ngày bỏ lỡ">❄️ <span id="streak-freeze-count" class="font-mono">0</span></span>
         </div>
@@ -238,6 +238,136 @@
 
       </div>
     </section>
+
+    <section id="streak-garden" class="streak-garden" data-stage="seed" aria-labelledby="tree-stage-name">
+      <div class="garden-main">
+        <p class="garden-eyebrow"><span aria-hidden="true">✧</span> CÂY CHUYÊN CẦN</p>
+        <h2 id="tree-stage-name">Hạt giống</h2>
+        <p class="garden-intro">Mỗi ngày giữ nhịp học, thêm một chút xanh. Cây lớn dần theo chuỗi ngày học liên tiếp của bạn.</p>
+
+        <div class="garden-progress-card">
+          <div class="garden-progress-heading">
+            <p id="tree-next-label">Học thêm 1 ngày để đạt Nảy mầm</p>
+            <span id="tree-progress-label" class="garden-percent">0%</span>
+          </div>
+          <div id="tree-progress-bar" class="garden-progress-track" role="progressbar" aria-label="Tiến độ phát triển của cây" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="tree-progress-fill" class="garden-progress-fill" style="width: 0%"></div>
+          </div>
+          <ol id="tree-stage-list" class="garden-stages" aria-label="Các giai đoạn phát triển của cây"></ol>
+        </div>
+      </div>
+
+      <div class="garden-illustration">
+        <span class="garden-art-caption">LỚN LÊN TỪ NHỮNG NGÀY BẠN CỐ GẮNG</span>
+        <svg id="tree-art" class="garden-art" viewBox="0 0 420 390" role="img" aria-labelledby="tree-art-title">
+          <title id="tree-art-title">Hạt giống — cây chuyên cần của bạn</title>
+          <defs>
+            <linearGradient id="garden-stem" x1="0" x2="1"><stop stop-color="#509e77"/><stop offset="1" stop-color="#8bc491"/></linearGradient>
+            <linearGradient id="garden-trunk" x1="0" x2="1"><stop stop-color="#a8764a"/><stop offset=".55" stop-color="#cf9c65"/><stop offset="1" stop-color="#875a38"/></linearGradient>
+            <linearGradient id="garden-leaf" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#399c7a"/><stop offset="1" stop-color="#a4d59a"/></linearGradient>
+            <linearGradient id="garden-canopy" x1="0" y1="1" x2=".7" y2="0"><stop stop-color="#237c65"/><stop offset="1" stop-color="#72b884"/></linearGradient>
+            <linearGradient id="garden-fruit" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe7a0"/><stop offset="1" stop-color="#e5a744"/></linearGradient>
+            <radialGradient id="garden-halo"><stop stop-color="#b8dca1" stop-opacity=".21"/><stop offset="1" stop-color="#b8dca1" stop-opacity="0"/></radialGradient>
+            <filter id="garden-soft-glow"><feGaussianBlur stdDeviation="5"/></filter>
+          </defs>
+
+          <circle class="garden-halo" cx="216" cy="185" r="145" fill="url(#garden-halo)"/>
+          <g class="garden-fireflies" fill="#e9da8c" aria-hidden="true">
+            <circle cx="315" cy="95" r="9" opacity=".18" filter="url(#garden-soft-glow)"/>
+            <circle cx="315" cy="95" r="2" opacity=".65"/>
+            <circle cx="87" cy="187" r="2" opacity=".35"/>
+            <circle cx="346" cy="228" r="1.5" opacity=".45"/>
+          </g>
+          <g fill="none" stroke="#4ca398" stroke-width="2" stroke-linecap="round" opacity=".36" aria-hidden="true">
+            <path d="M50 279q14-13 29 0"/><path d="M337 270q12-12 25 0"/>
+          </g>
+          <ellipse cx="210" cy="335" rx="160" ry="24" fill="#e9f3e7"/>
+          <path d="M65 335q143-37 291 0" fill="none" stroke="#a2d4c8" stroke-width="2"/>
+          <path d="M92 345q18-5 39-2m153 1q20-4 37 1" fill="none" stroke="#aedbd0" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="211" cy="333" rx="45" ry="8" fill="#b7b58d" opacity=".35"/>
+
+          <g class="tree-plant-stage" data-plant-stage="seed" aria-hidden="true">
+            <path d="M185 328q4-28 35-34 0 22-35 34Z" fill="#a87c52"/>
+            <path d="M187 326q16-17 30-29" fill="none" stroke="#e0bd88" stroke-width="3" stroke-linecap="round"/>
+            <path d="m205 301 4 10m-17 2 10 3" fill="none" stroke="#73533a" stroke-width="2"/>
+            <path d="M184 329q17 2 29-9" fill="none" stroke="#73533a" stroke-width="1.5"/>
+          </g>
+
+          <g class="tree-plant-stage" data-plant-stage="sprout" aria-hidden="true">
+            <g class="garden-tree-top">
+              <path d="M210 329q-8-42 1-74" fill="none" stroke="url(#garden-stem)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M210 280q-37-2-39-28 32-6 39 28Z" fill="url(#garden-leaf)"/>
+              <path d="M209 267q6-29 37-31-1 29-37 31Z" fill="url(#garden-leaf)"/>
+              <path d="m179 257 27 20m9-16 22-18" stroke="#d0e5b4" stroke-opacity=".5" fill="none" stroke-width="1.5"/>
+            </g>
+            <path d="m196 328 7-12 7 8 8-10 8 15" fill="#a88258" stroke="#bca076" stroke-width="1.5"/>
+          </g>
+
+          <g class="tree-plant-stage" data-plant-stage="stem" aria-hidden="true">
+            <g class="garden-tree-top">
+              <path d="M210 330q-10-63 2-132" fill="none" stroke="url(#garden-stem)" stroke-width="8" stroke-linecap="round"/>
+              <path d="M207 288q-50-6-53-39 44-6 53 39Z" fill="url(#garden-leaf)"/>
+              <path d="M210 260q10-44 52-44-5 35-52 44Z" fill="url(#garden-leaf)"/>
+              <path d="M210 229q-35-6-37-34 34 0 37 34Z" fill="url(#garden-leaf)"/>
+              <path d="M211 209q-2-30 25-45 14 32-25 45Z" fill="url(#garden-leaf)"/>
+              <path d="m165 256 35 26m18-26 33-28m-70-26 24 22m10-25 16-27" fill="none" stroke="#c5dfb0" stroke-width="1.5" opacity=".55"/>
+            </g>
+          </g>
+
+          <g class="tree-plant-stage" data-plant-stage="branches" aria-hidden="true">
+            <g class="garden-tree-top">
+              <path d="M199 331q13-71 5-151l10-17q-4 103 12 168Z" fill="url(#garden-trunk)"/>
+              <path d="M208 270q-31-29-47-66m49 41q39-37 51-70m-54 49q-26-29-25-58m27 31q12-27 13-55" fill="none" stroke="#a47c4e" stroke-width="7" stroke-linecap="round"/>
+              <path d="M166 218q-37 1-42-25 31-11 42 25Zm18-39q-31-8-26-34 31 1 26 34Zm78 4q-1-31 30-35 4 31-30 35Zm-40-27q-20-22 1-44 22 19-1 44Z" fill="url(#garden-leaf)"/>
+              <path d="M183 236q-31-1-37-22 29-8 37 22Zm62-25q8-29 37-24-3 28-37 24Z" fill="url(#garden-leaf)"/>
+            </g>
+          </g>
+
+          <g class="tree-plant-stage" data-plant-stage="leaves" aria-hidden="true">
+            <g class="garden-tree-top">
+              <path d="M195 332q19-91 9-161l13-18q-3 102 14 179Z" fill="url(#garden-trunk)"/>
+              <path d="M207 259q-33-37-47-70m51 51q32-32 53-71m-54 40q-9-36 6-75" fill="none" stroke="#ad8355" stroke-width="8" stroke-linecap="round"/>
+              <path d="M136 210c-32-3-44-31-28-56-4-31 20-56 49-51 15-35 57-44 82-19 33-11 66 11 66 40 31 11 44 48 22 71-5 33-46 48-75 27-24 24-58 19-74-1-13 10-31 6-42-11Z" fill="url(#garden-canopy)"/>
+              <path d="M135 158q23-20 44-8m17-42q25-14 42 4m16 62q23-23 45-9m-116 29q23-16 42-3" fill="none" stroke="#b3d6a0" stroke-width="3" stroke-linecap="round" opacity=".48"/>
+              <path d="M211 244v-61m-3 39-35-39m41 20 37-30" fill="none" stroke="#b58e5c" stroke-width="6" stroke-linecap="round"/>
+              <path d="M207 212q-25-6-23-25 22-2 23 25Zm10-17q6-24 28-23 0 23-28 23Z" fill="#85bf8d"/>
+            </g>
+          </g>
+
+          <g class="tree-plant-stage" data-plant-stage="fruit" aria-hidden="true">
+            <g class="garden-tree-top">
+              <path d="M191 332q22-93 12-165l14-19q-3 109 18 184Z" fill="url(#garden-trunk)"/>
+              <path d="M207 262q-36-37-51-72m56 49q35-31 56-75m-57 42q-10-35 6-78" fill="none" stroke="#ad8355" stroke-width="9" stroke-linecap="round"/>
+              <path d="M124 213c-35-3-48-34-30-62-5-34 22-62 54-57 17-38 63-48 91-20 36-13 73 12 72 44 34 13 49 53 25 79-5 37-51 54-83 30-27 26-64 21-82-2-14 12-35 8-47-12Z" fill="url(#garden-canopy)"/>
+              <path d="M123 156q26-22 50-8m20-43q27-15 46 5m17 65q25-26 49-10m-125 32q25-18 46-3" fill="none" stroke="#b3d6a0" stroke-width="3" stroke-linecap="round" opacity=".48"/>
+              <path d="M210 250v-66m-3 41-39-40m46 21 41-34" fill="none" stroke="#b58e5c" stroke-width="7" stroke-linecap="round"/>
+              <g fill="url(#garden-fruit)" stroke="#e7ba61" stroke-width="1">
+                <circle cx="136" cy="168" r="12"/><circle cx="189" cy="119" r="11"/><circle cx="270" cy="143" r="13"/><circle cx="236" cy="208" r="12"/><circle cx="169" cy="208" r="9"/>
+              </g>
+              <g fill="none" stroke="#477a58" stroke-width="2.5" stroke-linecap="round">
+                <path d="m136 156 2-7m51-41 2-7m79 29 2-7m-36 73 2-7m-69 7 2-6"/>
+              </g>
+              <g fill="#c4e1a2"><path d="M138 153q7-9 14-2-6 6-14 2Zm55-48q6-8 12-1-5 5-12 1Zm79 22q8-10 15-2-6 6-15 2Z"/></g>
+              <g fill="#fff2c5" opacity=".65"><circle cx="132" cy="165" r="3"/><circle cx="185" cy="116" r="2.5"/><circle cx="265" cy="139" r="3"/><circle cx="232" cy="205" r="3"/></g>
+            </g>
+          </g>
+        </svg>
+        <p class="garden-art-note">Một chút bền bỉ. Một khu vườn của riêng bạn.</p>
+      </div>
+
+      <div class="garden-streak-summary">
+        <div class="garden-streak-icon" aria-hidden="true">🌱</div>
+        <div class="garden-streak-copy">
+          <p class="garden-streak-total"><strong id="tree-days">0</strong><span>ngày học liên tiếp</span></p>
+          <p id="tree-status">Hoàn thành một phiên từ 30 phút để gieo ngày đầu tiên.</p>
+        </div>
+        <div class="garden-freeze-summary">
+          <span class="garden-freeze-stock">❄ <strong id="tree-freeze-stock">0</strong><span>viên đóng băng</span></span>
+          <p id="tree-freeze-note">Ngày được đóng băng giữ nguyên cây, không cộng ngày phát triển.</p>
+        </div>
+      </div>
+    </section>
+
 
     <!-- ===============================================
          NAVIGATION TABS
@@ -471,7 +601,7 @@
           </div>
           <div class="shop-freeze-stats">
             <div><span class="shop-freeze-stat-label">TRONG TÚI</span><div class="shop-freeze-stat-number">❄️ <span id="shop-freeze-count">0</span><span class="shop-freeze-stat-unit"> / 3 viên</span></div></div>
-            <div class="shop-freeze-current"><span class="shop-freeze-stat-label">CHUỖI HIỆN TẠI</span><div class="shop-freeze-stat-number shop-freeze-streak">🔥 <span id="shop-streak-count">0</span><span class="shop-freeze-stat-unit"> ngày</span></div></div>
+            <div class="shop-freeze-current"><span class="shop-freeze-stat-label">CHUỖI HIỆN TẠI</span><div class="shop-freeze-stat-number shop-freeze-streak"><span id="shop-streak-icon" aria-hidden="true">🌰</span> <span id="shop-streak-count">0</span><span class="shop-freeze-stat-unit"> ngày</span></div></div>
             <span class="shop-freeze-note">Tự dùng khi đủ số viên bảo vệ</span>
           </div>
         </section>
@@ -516,7 +646,7 @@
         </div>
         <div class="rpg-card p-4 rounded-xl text-center">
           <div class="text-xs font-bold text-slate-400 uppercase">Chuỗi Hiện Tại</div>
-          <div class="font-display font-black text-2xl text-rose-400 mt-1">🔥 <span id="stat-streak-count">0</span></div>
+          <div class="font-display font-black text-2xl text-rose-400 mt-1"><span id="stat-streak-icon" aria-hidden="true">🌰</span> <span id="stat-streak-count">0</span></div>
           <div class="text-[10px] text-slate-500 mt-0.5">Ngày liên tiếp</div>
         </div>
         <div class="rpg-card p-4 rounded-xl text-center">

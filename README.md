@@ -1,3 +1,9 @@
+## Cây chuyên cần từ streak
+
+Streak được minh họa thành cây: 0 ngày Hạt giống, 1 ngày Nảy mầm, 3 ngày Vươn thân, 7 ngày Phân cành, 14 ngày Xanh tán, 30 ngày Kết trái. Thanh tiến độ thể hiện số ngày từ mốc hiện tại tới mốc kế tiếp, không dùng EXP để lớn cây. Sau 30 ngày, cây giữ giai đoạn kết trái và bộ đếm vẫn tiếp tục tăng.
+
+Cây được suy ra trực tiếp từ streak đã lưu, không có bộ đếm tăng trưởng riêng. Ngày dùng đóng băng giữ nguyên cây; chỉ ngày học được tích streak mới giúp cây phát triển. Khi chuỗi gãy, cây về hạt giống. Tiến độ sẵn có tự áp dụng cho hình minh họa khi đăng nhập trên máy khác.
+
 ## Shop và bảo vệ streak
 
 Shop có 22 vật phẩm, chia nhóm bảo vệ chuỗi, bùa hỗ trợ, bạn đồng hành, danh hiệu và khung avatar. Vật phẩm vĩnh viễn mua một lần, được trang bị/tháo miễn phí; chỉ dùng một bùa và một bạn đồng hành mỗi lần.

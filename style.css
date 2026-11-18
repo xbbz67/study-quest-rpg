@@ -495,3 +495,107 @@ body.zen-active {
     margin: 1.5rem auto 0;
   }
 }
+
+/* A streak is a growing plant, with the same real-day and freeze rules as the game. */
+.streak-garden {
+  --garden-ink: #f4f1e5;
+  --garden-muted: #b5d0cc;
+  --garden-accent: #43d4bf;
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(16rem, 1fr);
+  grid-template-areas: "main art" "summary art";
+  gap: 1rem 1.75rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  border: 1px solid #426a63;
+  border-radius: 2rem;
+  background: radial-gradient(ellipse at 96% 2%, #2a635723, transparent 58%), #183e3d;
+  color: var(--garden-ink);
+  isolation: isolate;
+}
+
+.garden-main { grid-area: main; min-width: 0; }
+.garden-eyebrow { display: flex; align-items: center; gap: .5rem; margin: 0 0 .65rem; color: #7dc8b8; font-size: .625rem; font-weight: 800; letter-spacing: .19em; }
+.garden-eyebrow span { font-size: 1.15rem; line-height: 1; }
+.streak-garden h2 { margin: 0; font-family: var(--font-sans, sans-serif); font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 800; line-height: 1.16; letter-spacing: -.055em; color: var(--garden-ink); }
+.garden-intro { max-width: 42rem; margin: .8rem 0 1.5rem; color: var(--garden-muted); font-size: .8125rem; font-weight: 500; line-height: 1.75; }
+
+.garden-progress-card { padding: 1.3rem 1.4rem 1.1rem; border: 1px solid #6ca99a27; border-radius: 1.3rem; background: #265653; }
+.garden-progress-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+#tree-next-label { margin: 0; color: var(--garden-ink); font-size: .75rem; font-weight: 800; line-height: 1.6; }
+.garden-percent { flex-shrink: 0; display: grid; min-width: 2.7rem; min-height: 2rem; place-items: center; padding: .3rem .6rem; border-radius: 999px; color: #edfbf3; background: #163f3f; font-size: .6875rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.garden-progress-track { height: .45rem; overflow: hidden; border-radius: 999px; background: #3a6c66; }
+.garden-progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #22b8ad, #78ddba); transition: width .6s ease; }
+.garden-stages { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .4rem; margin: 1.15rem 0 0; padding: 0; list-style: none; }
+.tree-step { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: .4rem; padding: .2rem 0; text-align: center; color: #bad3cb; }
+.tree-step-number { display: grid; width: 1.8rem; height: 1.8rem; place-items: center; border: 1px solid transparent; border-radius: .65rem; font-size: .625rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tree-step-name { font-size: .625rem; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
+.tree-step-days { color: #93b9ad; font-size: .5625rem; font-variant-numeric: tabular-nums; }
+.tree-step.is-current, .tree-step[aria-current="step"] { color: #fff9e8; }
+.tree-step.is-current .tree-step-number, .tree-step[aria-current="step"] .tree-step-number { color: #0b3938; background: var(--garden-accent); }
+.tree-step.is-complete .tree-step-number { color: #89e4bd; border-color: #7dc8a647; background: #21514d; }
+
+.garden-illustration { grid-area: art; display: flex; min-width: 0; flex-direction: column; justify-content: center; align-items: center; padding-top: 1rem; }
+.garden-art { display: block; width: 100%; max-width: 27rem; overflow: visible; }
+.garden-art-caption { color: #9fc3b9; opacity: .6; font-size: .5rem; font-weight: 700; letter-spacing: .15em; line-height: 1.8; text-align: center; }
+.garden-art-note { margin: -.25rem 0 0; color: #a4c6bb; opacity: .7; font-size: .625rem; line-height: 1.7; text-align: center; }
+.tree-plant-stage { display: none; }
+.streak-garden[data-stage="seed"] [data-plant-stage="seed"],
+.streak-garden[data-stage="sprout"] [data-plant-stage="sprout"],
+.streak-garden[data-stage="stem"] [data-plant-stage="stem"],
+.streak-garden[data-stage="branches"] [data-plant-stage="branches"],
+.streak-garden[data-stage="leaves"] [data-plant-stage="leaves"],
+.streak-garden[data-stage="fruit"] [data-plant-stage="fruit"] { display: inline; }
+.garden-tree-top { transform-box: view-box; transform-origin: 210px 330px; animation: garden-sway 7s ease-in-out infinite; }
+.garden-fireflies { animation: garden-breathe 5s ease-in-out infinite; }
+.garden-halo { animation: garden-breathe 7s ease-in-out infinite alternate; }
+.streak-garden[data-protected="true"] .garden-progress-card { border-color: #8bd9ed70; }
+.streak-garden[data-protected="true"] .garden-streak-icon { background: #4a819469; }
+
+.garden-streak-summary { grid-area: summary; display: flex; align-items: center; gap: 1rem; min-width: 0; padding: 1.2rem 1.4rem; border: 1px solid #6ca99a27; border-radius: 1.3rem; background: #265653; }
+.garden-streak-icon { display: grid; flex: 0 0 2.5rem; width: 2.5rem; height: 2.5rem; place-items: center; border-radius: 1rem; color: #b8e3b4; background: #75bba827; font-size: 1.5rem; }
+.garden-streak-copy { flex: 1; min-width: 0; }
+.garden-streak-total { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem; margin: 0 0 .25rem; }
+.garden-streak-total strong { font-size: 2rem; line-height: 1; font-weight: 800; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.garden-streak-total span { font-size: .6875rem; font-weight: 800; }
+#tree-status { max-width: 24rem; margin: 0; color: var(--garden-muted); font-size: .625rem; line-height: 1.75; }
+.garden-freeze-summary { flex: 0 0 9.5rem; padding-left: 1rem; border-left: 1px solid #91c5b132; }
+.garden-freeze-stock { display: flex; flex-shrink: 0; align-items: baseline; gap: .35rem; color: #b8e7e7; font-size: .8rem; white-space: nowrap; }
+.garden-freeze-stock strong { font-size: 1.05rem; font-weight: 800; }
+.garden-freeze-stock span { font-size: .5625rem; }
+#tree-freeze-note { margin: .3rem 0 0; color: #a0c5bb; font-size: .5625rem; line-height: 1.7; }
+
+@keyframes garden-sway { 0%,100% { transform: rotate(-.7deg); } 50% { transform: rotate(.7deg); } }
+@keyframes garden-breathe { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+
+@media (max-width: 1050px) and (min-width: 761px) {
+  .streak-garden { grid-template-columns: minmax(0, 1.45fr) minmax(12rem, 1fr); gap: 1rem; }
+  .garden-streak-summary { flex-wrap: wrap; gap: .65rem; }
+  .garden-freeze-summary { display: flex; align-items: center; gap: .7rem; flex-basis: 100%; border-left: 0; border-top: 1px solid #91c5b132; padding: .65rem 0 0; }
+  #tree-freeze-note { margin: 0; }
+}
+
+@media (max-width: 760px) {
+  .streak-garden { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "art" "summary"; gap: .5rem; border-radius: 1.5rem; }
+  .garden-intro { margin-bottom: 1.1rem; }
+  .garden-progress-card { padding: 1rem .85rem; }
+  .garden-progress-heading { gap: .5rem; }
+  #tree-next-label { font-size: .6875rem; }
+  .garden-stages { gap: .25rem; }
+  .tree-step-name { font-size: .5625rem; }
+  .tree-step-days { font-size: .5rem; }
+  .garden-illustration { padding: .65rem 0 .75rem; }
+  .garden-art { max-width: 19rem; margin-top: -1rem; margin-bottom: -1.3rem; }
+  .garden-art-caption { font-size: .4375rem; }
+  .garden-art-note { margin-top: 0; }
+  .garden-streak-summary { flex-wrap: wrap; padding: 1rem; gap: .75rem; }
+  .garden-freeze-summary { flex-basis: 100%; display: flex; align-items: center; gap: .75rem; border-left: 0; border-top: 1px solid #91c5b132; padding: .7rem 0 0; }
+  #tree-freeze-note { flex: 1; margin: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-tree-top, .garden-fireflies, .garden-halo { animation: none; }
+  .garden-progress-fill { transition: none; }
+}

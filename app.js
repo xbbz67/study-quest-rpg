@@ -46,6 +46,14 @@ const SHOP_ITEMS = [
   { id: 'frame_rainbow', category: 'frame', name: 'Khung Lăng Kính', desc: 'Hào quang đổi màu quanh avatar. Vật phẩm trang trí, không thay đổi rank.', cost: 550, icon: '🌈', frameClass: 'avatar-frame-challenger' }
 ];
 const MAX_STREAK_FREEZES = 3;
+const STREAK_TREE_STAGES = [
+  { id: 'seed', name: 'Hạt giống', minDays: 0, icon: '🌰' },
+  { id: 'sprout', name: 'Nảy mầm', minDays: 1, icon: '🌱' },
+  { id: 'stem', name: 'Vươn thân', minDays: 3, icon: '🌿' },
+  { id: 'branches', name: 'Phân cành', minDays: 7, icon: '🌿' },
+  { id: 'leaves', name: 'Xanh tán', minDays: 14, icon: '🌳' },
+  { id: 'fruit', name: 'Kết trái', minDays: 30, icon: '🍎' }
+];
 
 const DEFAULT_STATE = {
   character: {
@@ -411,6 +419,7 @@ function earnDailyStreak() {
   state.lastActiveDate = today;
   state.streakProtectedThrough = null;
   saveGameState();
+  renderHUD();
 }
 
 function checkBuffExpiration() {
@@ -1151,7 +1160,56 @@ function renderRankMilestones() {
 // 9. HUD, UI & MODAL RENDERING
 // ==========================================
 
+function getStreakTreeProgress(streak) {
+  const numeric = Number(streak);
+  const days = Number.isFinite(numeric) ? Math.max(0, Math.floor(numeric)) : 0;
+  const index = STREAK_TREE_STAGES.findLastIndex(stage => days >= stage.minDays);
+  const stage = STREAK_TREE_STAGES[index];
+  const nextStage = STREAK_TREE_STAGES[index + 1] || null;
+  const progress = nextStage ? Math.min(100, Math.floor((days - stage.minDays) / (nextStage.minDays - stage.minDays) * 100)) : 100;
+  return { stage, nextStage, days, progress, remaining: nextStage ? nextStage.minDays - days : 0 };
+}
+
+function renderStreakTree() {
+  const growth = getStreakTreeProgress(state.streak);
+  for (const id of ['streak-tree-icon', 'stat-streak-icon', 'shop-streak-icon']) {
+    const icon = document.getElementById(id);
+    if (icon) icon.textContent = growth.stage.icon;
+  }
+  const garden = document.getElementById('streak-garden');
+  if (!garden) return;
+  garden.dataset.stage = growth.stage.id;
+  const today = getQuestDay();
+  const earnedToday = state.streakEarnedToday === today;
+  const preserved = !earnedToday && state.streak > 0 && streakDayNumber(state.streakProtectedThrough) !== null && streakDayNumber(state.streakProtectedThrough) >= streakDayNumber(today) - 1;
+  garden.dataset.protected = String(preserved);
+  const text = {
+    'tree-stage-name': growth.stage.name,
+    'tree-days': growth.days,
+    'tree-next-label': growth.nextStage ? `Còn ${growth.remaining} ngày học để đạt ${growth.nextStage.name}` : 'Cây đã kết trái. Tiếp tục chăm sóc chuỗi học của bạn!',
+    'tree-progress-label': `${growth.progress}%`,
+    'tree-art-title': `Cây chuyên cần: ${growth.stage.name}, ${growth.days} ngày học liên tiếp`,
+    'tree-status': earnedToday ? 'Đã chăm cây hôm nay. Hẹn bạn vào ngày mai!' : 'Hoàn thành một phiên từ 30 phút để chăm cây và tăng chuỗi hôm nay.',
+    'tree-freeze-note': preserved ? 'Đã giữ cây qua ngày bỏ lỡ. Học để cây tiếp tục lớn.' : 'Đóng băng giữ nguyên cây, không cộng ngày.',
+    'tree-freeze-stock': String(state.streakFreezes || 0)
+  };
+  for (const [id, value] of Object.entries(text)) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+  const progressBar = document.getElementById('tree-progress-bar');
+  if (progressBar) {
+    progressBar.setAttribute('aria-valuenow', String(growth.progress));
+    progressBar.setAttribute('aria-valuetext', growth.nextStage ? `${growth.remaining} ngày đến ${growth.nextStage.name}` : 'Đã đạt Kết trái');
+  }
+  const fill = document.getElementById('tree-progress-fill');
+  if (fill) fill.style.width = `${growth.progress}%`;
+  const steps = document.getElementById('tree-stage-list');
+  if (steps) steps.innerHTML = STREAK_TREE_STAGES.map((stage, index) => `<li class="tree-step ${stage.id === growth.stage.id ? 'is-current' : stage.minDays < growth.stage.minDays ? 'is-complete' : ''}" ${stage.id === growth.stage.id ? 'aria-current="step"' : ''}><span class="tree-step-number">${String(index + 1).padStart(2, '0')}</span><span class="tree-step-name">${stage.name}</span><span class="tree-step-days">${stage.minDays === 0 ? 'Khởi đầu' : `${stage.minDays} ngày`}</span></li>`).join('');
+}
+
 function renderHUD() {
+  renderStreakTree();
   const currentRank = getCurrentRank(state.level);
   const nextRank = getNextRank(state.level);
   const expNeeded = getExpNeeded(state.level);

@@ -1,5 +1,5 @@
 ﻿window.TheaterLive=(()=>{
- let current=null,player=null,spotify=null,poll=null,heartbeatTimer=null,generation=0,epoch=0,request=0,eventVersion=0,offset=0,active=false,localPaused=false,spState=null,spUri=null,heartbeatBusy=false,controlBusy=false,lastCorrection=0,driftSamples=0,programUntil=0;
+ let current=null,player=null,spotify=null,poll=null,heartbeatTimer=null,generation=0,epoch=0,request=0,eventVersion=0,offset=0,active=false,localPaused=false,spState=null,spUri=null,heartbeatBusy=false,controlBusy=false,lastCorrection=0,driftSamples=0,programUntil=0,seekWatch=null,lastHostSample=null,playerHostRole=null;
  const sdks={},el=id=>document.getElementById(id),context=()=>Theater.getContext(),status=text=>{el('theater-media-status').textContent=text;};
  function sdk(kind){
   if(kind==='yt'&&window.YT?.Player)return Promise.resolve(YT);
@@ -15,12 +15,12 @@
  function elapsed(){if(!current)return 0;return Math.max(0,(current.playback_position||0)+(current.playback_paused?0:(Date.now()-Date.parse(current.playback_updated_at||current.started_at))/1000-offset));}
  function isHost(){return !!current&&current.owner===context().user?.id;}
  function isLive(){return !!(current?.is_live||player?.getVideoData?.()?.isLive);}
- function suppress(){programUntil=performance.now()+1600;}
- function destroy(){try{player?.destroy();}catch{}try{spotify?.destroy();}catch{}player=spotify=spState=null;spUri=null;el('theater-screen').replaceChildren();}
+ function suppress(){programUntil=performance.now()+1600;lastHostSample=null;}
+ function destroy(){try{player?.destroy();}catch{}try{spotify?.destroy();}catch{}player=spotify=spState=null;spUri=null;lastHostSample=null;playerHostRole=null;el('theater-screen').replaceChildren();}
  function single(media){return media.provider==='YouTube'?!new URL(media.src).searchParams.has('list'):/\/(track|episode)\//.test(media.original);}
- function renderControl(){const button=el('theater-shared-toggle');button.disabled=!isHost()||controlBusy;button.textContent=current?.playback_paused?'▶ Phát cho cả phòng':'Ⅱ Tạm dừng cả phòng';el('theater-room-playback').textContent=!current?'Chưa có nội dung':current.playback_paused?'Ⅱ Cả phòng đang tạm dừng':isLive()?'● Đang xem nguồn trực tiếp':'▶ Cả phòng đang phát';el('theater-control-hint').textContent=isHost()?'Bạn đang điều khiển nội dung này.':'Người thêm link đang phát điều khiển phát / tạm dừng chung.';}
+ function renderControl(){const button=el('theater-shared-toggle');button.hidden=!isHost();el('theater-next').hidden=!isHost();button.disabled=!isHost()||controlBusy;button.textContent=current?.playback_paused?'▶ Phát cho cả phòng':'Ⅱ Tạm dừng cả phòng';el('theater-room-playback').textContent=!current?'Chưa có nội dung':current.playback_paused?'Ⅱ Cả phòng đang tạm dừng':isLive()?'● Đang xem nguồn trực tiếp':'▶ Cả phòng đang phát';el('theater-control-hint').textContent=isHost()?'Bạn là host của video này: có thể tua trên thanh thời gian.':'Người thêm link đang phát điều khiển phát / tạm dừng chung.';}
  async function mount(item){
-  const token=++generation;destroy();localPaused=false;lastCorrection=0;driftSamples=0;let durationReported=false;
+  const token=++generation;destroy();playerHostRole=isHost();el('theater-screen').dataset.viewer=String(!playerHostRole);localPaused=false;lastCorrection=0;driftSamples=0;let durationReported=false;
   const media=Theater.parseMediaLink(item.link);if(!media){status('Link đang phát không hợp lệ.');return;}
   el('theater-external').href=media.original;el('theater-external').hidden=false;
   status(media.provider==='Spotify'?'Đang nghe chung. Khả năng tua đồng bộ phụ thuộc player Spotify.':'Nếu chưa phát, bấm “Vào xem trực tiếp”. Nút phát / tạm dừng chung nằm bên cạnh.');
@@ -28,8 +28,8 @@
   const api=await sdk(media.provider==='YouTube'?'yt':'sp');if(token!==generation||!active)return;
   if(media.provider==='YouTube'){
    const url=new URL(media.src),id=url.pathname.split('/').pop();
-   player=new api.Player(target,{videoId:id==='videoseries'?undefined:id,playerVars:{autoplay:item.playback_paused?0:1,playsinline:1,origin:location.origin,...(!item.is_live?{start:Math.floor(elapsed())}:{}),...(url.searchParams.has('list')?{list:url.searchParams.get('list'),listType:'playlist'}:{})},events:{
-    onReady:()=>{if(token===generation&&player)joinLive();},
+   player=new api.Player(target,{videoId:id==='videoseries'?undefined:id,playerVars:{autoplay:item.playback_paused?0:1,playsinline:1,controls:playerHostRole?1:0,disablekb:playerHostRole?0:1,origin:location.origin,...(!item.is_live?{start:Math.floor(elapsed())}:{}),...(url.searchParams.has('list')?{list:url.searchParams.get('list'),listType:'playlist'}:{})},events:{
+    onReady:()=>{if(token===generation&&player){const iframe=player.getIframe?.();if(iframe){iframe.title=playerHostRole?'YouTube · Bạn đang điều khiển':'YouTube · Màn hình chung';iframe.tabIndex=playerHostRole?0:-1;}joinLive();}},
     onStateChange:event=>{
      if(token!==generation||!player||!current)return;
      if(event.data===1&&single(media)&&!durationReported&&isHost()&&!isLive()){const duration=player.getDuration();if(duration>0){durationReported=true;void context().client.rpc('theater_duration',{expected_id:item.id,seconds:duration});}}
@@ -58,7 +58,7 @@
    if(index!=null&&player.getPlaylistIndex?.()!==index&&!host){suppress();player.playVideoAt(index);seek=true;}
    const drift=Math.abs(player.getCurrentTime()-target);
    if(!live&&!host&&!current.playback_paused&&state===1&&drift>3)driftSamples++;else driftSamples=0;
-   if(!live&&(seek||(canCorrect&&driftSamples>=2))&&(drift>.6||force)){suppress();player.seekTo(target,true);lastCorrection=performance.now();driftSamples=0;}
+   if((!live||(controlChanged&&current.control_action==='seek'))&&(seek||(canCorrect&&driftSamples>=2))&&(drift>.6||force)){suppress();player.seekTo(target,true);lastCorrection=performance.now();driftSamples=0;}
    if(current.playback_paused){if(state!==2){suppress();player.pauseVideo();}}
    else if(force||controlChanged){suppress();player.playVideo();}
   }
@@ -75,7 +75,7 @@
   const row=event.new;if(!active||event.eventType!=='UPDATE'||!current||row?.id!==current.id||row.status!=='playing')return false;
   if(older(row))return true;
   const changed=(row.control_revision||0)!==(current.control_revision||0)||!!row.playback_paused!==!!current.playback_paused;
-  current={...current,...row};eventVersion++;renderControl();syncPlayer(false,changed);return true;
+  current={...current,...row};eventVersion++;renderControl();if(playerHostRole!==null&&playerHostRole!==isHost())void mount(current);else syncPlayer(false,changed);return true;
  }
  async function heartbeat(){
   if(!current||localPaused||current.playback_paused||heartbeatBusy||controlBusy||!isHost())return;let position=null,index=null,uri=null;
@@ -94,18 +94,18 @@
   if(!now||!older(now))current=now;
   el('theater-queue').replaceChildren(...data.filter(row=>row.status==='waiting').map(row=>{const li=document.createElement('li');li.textContent=row.link;return li;}));el('theater-next').disabled=!isHost();renderControl();
   if(changed){if(now)void mount(now).catch(()=>{if(captured===epoch)status('Chưa mở được player. Bấm “Vào xem trực tiếp” để thử lại.');});else{generation++;destroy();el('theater-external').hidden=true;status('Phòng chưa có nội dung. Link đầu tiên sẽ phát cho mọi người.');}}
-  else if(now)syncPlayer(false,controls);else status('Phòng chưa có nội dung. Thêm link đầu tiên để cùng xem.');
+  else if(now){if(playerHostRole!==null&&playerHostRole!==isHost())void mount(now);else syncPlayer(false,controls);}else status('Phòng chưa có nội dung. Thêm link đầu tiên để cùng xem.');
  }
  async function sharedControl(action){
   if(!isHost()||controlBusy)return;controlBusy=true;renderControl();const item=current,version=epoch;
   let position=elapsed(),index=current.playback_index??null,uri=current.playback_uri??null;
-  if(action==='pause'){if(player)position=player.getCurrentTime();if(spotify&&spState)position=spState.position/1000;}
+  if(action==='pause'||action==='seek'){if(player)position=player.getCurrentTime();if(spotify&&spState)position=spState.position/1000;}
   if(player?.getPlaylist?.()?.length)index=player.getPlaylistIndex();
   try{
    const {data,error}=await context().client.rpc('theater_control',{expected_id:item.id,action,position_seconds:position,expected_revision:item.control_revision||0,playlist_index:index,playing_uri:uri});
    if(!active||version!==epoch)return;
    if(error){status(error.code==='PT409'?'Trạng thái vừa thay đổi. Đã tải lại, bạn thử lại nhé.':'Chưa đổi được trạng thái phòng. Kiểm tra kết nối rồi thử lại.');await refresh();return;}
-   if(current?.id===item.id){applyUpdate({eventType:'UPDATE',new:data.item});status(action==='pause'?'Đã tạm dừng cho cả phòng.':'Đã phát tiếp cho cả phòng.');}
+   if(current?.id===item.id){applyUpdate({eventType:'UPDATE',new:data.item});status(action==='seek'?'Đã cập nhật vị trí phát cho cả phòng.':action==='pause'?'Đã tạm dừng cho cả phòng.':'Đã phát tiếp cho cả phòng.');}
   }catch{status('Mất kết nối. Chưa thay đổi trạng thái chung.');}
   finally{controlBusy=false;renderControl();}
  }
@@ -118,9 +118,18 @@
  async function next(){if(!current||current.playback_paused&&!isHost())return;const {client}=context(),{error}=await client.rpc('theater_next',{expected_id:current.id});if(!error)await refresh();}
  function joinLive(){localPaused=false;if(current&&!player&&!spotify){void mount(current).catch(()=>status('Chưa tải được player. Kiểm tra kết nối rồi thử lại.'));return;}syncPlayer(true);}
  function pauseLocal(){localPaused=true;suppress();player?.pauseVideo();spotify?.pause();status('Chỉ tạm dừng máy bạn. “Vào xem trực tiếp” để trở lại trạng thái chung.');}
+ function detectHostSeek(){
+  if(!active||!isHost()||localPaused||controlBusy||!player?.getCurrentTime){lastHostSample=null;return;}
+  const state=player.getPlayerState();if(state===3)return;if(state!==1&&state!==2){lastHostSample=null;return;}
+  const now=performance.now(),position=player.getCurrentTime(),index=player.getPlaylistIndex?.()??0;
+  if(!Number.isFinite(position))return;
+  const previous=lastHostSample;lastHostSample={at:now,position,index,state};if(!previous)return;
+  const expected=previous.position+(previous.state===1?(now-previous.at)/1000:0);
+  if(index!==previous.index||Math.abs(position-expected)>1){lastHostSample=null;void sharedControl('seek');}
+ }
  function resumeConnection(){if(active)void refresh();}
- function enter(){active=true;epoch++;void refresh();clearInterval(poll);clearInterval(heartbeatTimer);poll=setInterval(()=>{void refresh();},6000);heartbeatTimer=setInterval(()=>{void heartbeat().catch(()=>{});},1500);}
- function leave(){active=false;epoch++;clearInterval(poll);clearInterval(heartbeatTimer);generation++;current=null;destroy();}
+ function enter(){active=true;epoch++;void refresh();clearInterval(poll);clearInterval(heartbeatTimer);poll=setInterval(()=>{void refresh();},6000);heartbeatTimer=setInterval(()=>{void heartbeat().catch(()=>{});},1500);clearInterval(seekWatch);seekWatch=setInterval(detectHostSeek,250);}
+ function leave(){active=false;epoch++;clearInterval(poll);clearInterval(heartbeatTimer);clearInterval(seekWatch);generation++;current=null;destroy();}
  document.addEventListener('DOMContentLoaded',()=>{el('theater-next').addEventListener('click',()=>{void next();});el('theater-join-live').addEventListener('click',joinLive);el('theater-shared-toggle').addEventListener('click',()=>{void sharedControl(current?.playback_paused?'play':'pause');});});
  window.addEventListener('online',resumeConnection);document.addEventListener('visibilitychange',()=>{if(!document.hidden)resumeConnection();});
  return{enter,leave,refresh,enqueue,joinLive,pauseLocal,applyUpdate,sharedControl};

@@ -138,3 +138,7 @@ Realtime Theater: áp dụng `20261120020000_theater_realtime.sql` và `20261120
 - YouTube livestream không bị ép seek theo đồng hồ phòng. Với video thường, chỉ sửa lệch lớn hơn 3 giây qua hai mốc liên tiếp, cách ít nhất 12 giây giữa các lần tua; lệch nhỏ được giữ để tránh giật. Spotify chỉ seek podcast khi vào xem hoặc có thao tác chung. Video vẫn do YouTube/Spotify phân phối; đây là phần đồng bộ tự viết, không phải dịch vụ truyền video riêng hay cam kết 0 ms.
 - Chat dùng được với tài khoản và phiên khách. RLS cho đọc tin trong 7 ngày; UI hiển thị 80 tin gần nhất. Gửi qua RPC, tối đa 500 ký tự, cách ít nhất 1,2 giây mỗi người. Tên và nội dung được render bằng textContent. Tin cũ được dọn khi có tin mới.
 - Kiểm tra database chạy trong giao dịch rollback; kiểm tra giao diện dùng ba phiên trình duyệt trong phòng giả lập riêng, không gửi tin thử vào phòng thật.
+
+### Quyền timeline theo video
+
+Người gửi video đang phát là host: YouTube hiện thanh thời gian và phím tua cho host. Người xem dùng `controls=0`, `disablekb=1`; các nút điều khiển chung ở sidebar cũng được ẩn. Chủ quyền tự đổi theo người gửi video tiếp theo và player được tạo lại khi danh tính đổi. Tua được gửi bằng RPC `theater_control` với action `seek`, kiểm tra owner và revision trên server. Tua khi đang pause giữ nguyên pause và cập nhật vị trí cho người vào sau. Migration: `20261120040000_theater_host_seek.sql`.

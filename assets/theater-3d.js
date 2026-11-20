@@ -67,10 +67,11 @@ function finishExit(id,actor){
  gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());geometries=geometries.filter(g=>!gs.has(g));materials=materials.filter(m=>!ms.has(m));
  actor.waiters.splice(0).forEach(resolve=>resolve());
 }
-function animate(actor,kind){
+function animate(actor,kind,previousSeat=null){
  const target=seatPoint(actor.record.seat),middle=aisle(),bottom=height-40;
  const start=actor.position||doorPoint('theater-door-in');
- const points=kind==='exit'?[start,{x:start.x,y:target.y+24},{x:middle,y:target.y+24},{x:middle,y:bottom},doorPoint('theater-door-exit')]:[start,{x:middle,y:bottom},{x:middle,y:target.y+24},{x:target.x,y:target.y+24},target];
+ const old=previousSeat?seatPoint(previousSeat):null;
+ const points=old&&kind==='enter'?[start,{x:start.x,y:old.y+24},{x:middle,y:old.y+24},{x:middle,y:target.y+24},{x:target.x,y:target.y+24},target]:kind==='exit'?[start,{x:start.x,y:target.y+24},{x:middle,y:target.y+24},{x:middle,y:bottom},doorPoint('theater-door-exit')]:[start,{x:middle,y:bottom},{x:middle,y:target.y+24},{x:target.x,y:target.y+24},target];
  const lengths=points.slice(1).map((p,i)=>Math.hypot(p.x-points[i].x,p.y-points[i].y));const distance=lengths.reduce((a,b)=>a+b,0);
  actor.motion={kind,points,lengths,distance,start:performance.now(),walk:clamp(distance/100,2.5,7)*1000,stand:kind==='exit'?450:0,sit:kind==='enter'?550:0};
  if(reduced.matches){if(kind==='exit')finishExit(actor.record.user_id,actor);else settle(actor);return;}
@@ -104,7 +105,7 @@ function sync(records,account,{confirmed=false}={}){
  for(const [id,actor] of actors)if(!incoming.has(id)&&actor.motion?.kind!=='exit')animate(actor,'exit');
  for(const [id,row] of incoming){let actor=actors.get(id);
   if(!actor){actor=createActor(row,account);actors.set(id,actor);if(initial&&id!==account)settle(actor);else{position(actor,doorPoint('theater-door-in'));animate(actor,'enter');}}
-  else {actor.shirt.color.set(colorFor(id,id===account));if(actor.record.seat!==row.seat||actor.motion?.kind==='exit'){actor.record={...row};animate(actor,'enter');}else actor.record={...row};}
+  else {actor.shirt.color.set(colorFor(id,id===account));if(actor.record.seat!==row.seat||actor.motion?.kind==='exit'){const previousSeat=actor.record.seat;actor.record={...row};animate(actor,'enter',previousSeat);}else actor.record={...row};}
  }
  updateDoors();renderer.render(scene,camera);if(Array.from(actors.values()).some(actor=>actor.motion))wake();
 }

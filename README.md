@@ -125,8 +125,16 @@ Leo rank từng ngày để mở khóa khung avatar và danh hiệu phát sáng 
 - Khách được cấp phiên Supabase ẩn danh riêng, lưu trong trình duyệt; không cần tạo tài khoản để chọn ghế. Tiến độ học cloud vẫn dùng tài khoản chính.
 - 48 ghế dùng chung trên mọi thiết bị, cập nhật trực tiếp qua Supabase Realtime, có polling dự phòng; ghế hết hạn sau 2 phút mất kết nối. Chuyển ghế đi qua hành lang hàng ghế và lối giữa.
 - Link đầu tiên phát chung, các link sau xếp FIFO. Mỗi người có tối đa 3 link đang chờ. Người thêm nội dung đang phát được chuyển link; hết video đơn/bài đơn thì server chuyển tiếp khi biết thời lượng.
-- Người vào sau nhận vị trí phát theo đồng hồ server; chủ nội dung gửi mốc phát mỗi giây. YouTube playlist đồng bộ cả chỉ số video. Nhấn “Vào xem trực tiếp” nếu trình duyệt chặn tự phát hoặc sau khi tạm dừng trên máy.
+- Người vào sau nhận vị trí phát theo đồng hồ server; chủ nội dung gửi mốc phát mỗi 1,5 giây. YouTube playlist đồng bộ cả chỉ số video. Nhấn “Vào xem trực tiếp” nếu trình duyệt chặn tự phát hoặc sau khi tạm dừng trên máy.
 - Spotify dùng player chính thức, chia sẻ nội dung hiện tại và mốc phát; khả năng tua nhạc, phát toàn bài và đăng nhập phụ thuộc Spotify. API chỉ bảo đảm thao tác seek cho podcast, vì vậy không bảo đảm nhạc Spotify khớp từng giây. Playlist/album Spotify chuyển hàng chờ bằng nút của người thêm link. YouTube live phát theo nguồn trực tiếp.
 - Dùng HTTP/HTTPS để tải module 3D. Backend cần bật Anonymous Sign-ins và áp dụng migrations trong `supabase/migrations/`. RLS chặn ghi trực tiếp vào ghế/hàng chờ, mọi thay đổi qua RPC kiểm tra danh tính và khóa giao dịch. Khóa service role không được đưa vào frontend.
 
-Realtime Theater: áp dụng thêm `20261120020000_theater_realtime.sql` để đưa hai bảng phòng vào publication. Client gỡ subscription khi rời phòng hoặc đổi danh tính, lấy snapshot khi kết nối lại. YouTube sửa lệch từ 1,2 giây với khoảng nghỉ 4 giây giữa các lần tua để tránh giật liên tục; Spotify từ 1,5 giây, vẫn phụ thuộc khả năng player. Không bảo đảm phát khớp tuyệt đối trên mọi mạng/thiết bị.
+Realtime Theater: áp dụng `20261120020000_theater_realtime.sql` và `20261120030000_theater_chat_controls.sql`. Ghế, chat và điều khiển nhận thay đổi qua WebSocket; mốc phát mới được áp dụng trực tiếp từ payload database để giảm một lượt lấy snapshot. Có snapshot dự phòng và tải lại sau khi nối mạng lại.
+
+### Chat và điều khiển chung
+
+- Người thêm link đang phát có nút phát / tạm dừng cả phòng. Nút pause trực tiếp trong iframe của người đó cũng được đồng bộ; buffering không được coi là thao tác pause. Người khác có thể tạm dừng riêng máy mình.
+- Pause lưu con trỏ cố định, ngừng tính thời gian chờ; người vào sau vẫn thấy phòng đang dừng. Revision kiểm tra cả điều khiển và heartbeat để bỏ qua gói cũ đến muộn.
+- YouTube livestream không bị ép seek theo đồng hồ phòng. Với video thường, chỉ sửa lệch lớn hơn 3 giây qua hai mốc liên tiếp, cách ít nhất 12 giây giữa các lần tua; lệch nhỏ được giữ để tránh giật. Spotify chỉ seek podcast khi vào xem hoặc có thao tác chung. Video vẫn do YouTube/Spotify phân phối; đây là phần đồng bộ tự viết, không phải dịch vụ truyền video riêng hay cam kết 0 ms.
+- Chat dùng được với tài khoản và phiên khách. RLS cho đọc tin trong 7 ngày; UI hiển thị 80 tin gần nhất. Gửi qua RPC, tối đa 500 ký tự, cách ít nhất 1,2 giây mỗi người. Tên và nội dung được render bằng textContent. Tin cũ được dọn khi có tin mới.
+- Kiểm tra database chạy trong giao dịch rollback; kiểm tra giao diện dùng ba phiên trình duyệt trong phòng giả lập riêng, không gửi tin thử vào phòng thật.

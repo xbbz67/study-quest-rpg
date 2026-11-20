@@ -118,3 +118,13 @@ Leo rank từng ngày để mở khóa khung avatar và danh hiệu phát sáng 
 2. Hoặc nhấp đúp vào [run.bat](file:///C:/Users/trong/.gemini/antigravity/scratch/study-quest-rpg/run.bat).
 3. Đặt mục tiêu hôm nay trong tab **📜 Nhiệm Vụ Hàng Ngày**.
 4. Chọn chế độ Pomodoro trong tab **⏱️ Cày Cấp** và bắt đầu cày cuốc!
+
+
+## Theater: phòng học và màn hình chung
+
+- Khách được cấp phiên Supabase ẩn danh riêng, lưu trong trình duyệt; không cần tạo tài khoản để chọn ghế. Tiến độ học cloud vẫn dùng tài khoản chính.
+- 48 ghế dùng chung trên mọi thiết bị, cập nhật mỗi 3 giây; ghế hết hạn sau 2 phút mất kết nối. Chuyển ghế đi qua hành lang hàng ghế và lối giữa.
+- Link đầu tiên phát chung, các link sau xếp FIFO. Mỗi người có tối đa 3 link đang chờ. Người thêm nội dung đang phát được chuyển link; hết video đơn/bài đơn thì server chuyển tiếp khi biết thời lượng.
+- Người vào sau nhận vị trí phát theo đồng hồ server; chủ nội dung gửi mốc phát mỗi 3 giây. YouTube playlist đồng bộ cả chỉ số video. Nhấn “Vào xem trực tiếp” nếu trình duyệt chặn tự phát hoặc sau khi tạm dừng trên máy.
+- Spotify dùng player chính thức, chia sẻ nội dung hiện tại và mốc phát; khả năng tua nhạc, phát toàn bài và đăng nhập phụ thuộc Spotify. API chỉ bảo đảm thao tác seek cho podcast, vì vậy không bảo đảm nhạc Spotify khớp từng giây. Playlist/album Spotify chuyển hàng chờ bằng nút của người thêm link. YouTube live phát theo nguồn trực tiếp.
+- Dùng HTTP/HTTPS để tải module 3D. Backend cần bật Anonymous Sign-ins và áp dụng migrations trong `supabase/migrations/`. RLS chặn ghi trực tiếp vào ghế/hàng chờ, mọi thay đổi qua RPC kiểm tra danh tính và khóa giao dịch. Khóa service role không được đưa vào frontend.

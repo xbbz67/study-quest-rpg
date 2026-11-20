@@ -2,6 +2,17 @@ window.Theater = (() => {
  const el=id=>document.getElementById(id);
  let active=false, rows=[], seat=null, account=null, connected=false, busy=false, polling=null, lastBeat=0, epoch=0, refreshNumber=0, releasePending=Promise.resolve(),doorBusy=false,sceneLoader=null;
  let guestClient=null,guestUser=null,identityPromise=null,seatClient=null;
+ let roomChannel=null,realtimeClient=null,realtimeAccount=null,realtimeReady=false,seatEvent=null,mediaEvent=null;
+ function stopRealtime(){clearTimeout(seatEvent);clearTimeout(mediaEvent);if(roomChannel)void realtimeClient.removeChannel(roomChannel);roomChannel=null;realtimeClient=null;realtimeAccount=null;realtimeReady=false;}
+ function connectRealtime(client,user){
+  if(roomChannel&&realtimeClient===client&&realtimeAccount===user.id)return;
+  stopRealtime();realtimeClient=client;realtimeAccount=user.id;
+  const channel=client.channel('study-theater-room-v2')
+   .on('postgres_changes',{event:'*',schema:'public',table:'theater_seats'},()=>{clearTimeout(seatEvent);seatEvent=setTimeout(()=>{if(active)void refresh();},60);})
+   .on('postgres_changes',{event:'*',schema:'public',table:'theater_queue'},()=>{clearTimeout(mediaEvent);mediaEvent=setTimeout(()=>{if(active)void window.TheaterLive?.refresh();},60);});
+  roomChannel=channel;
+  channel.subscribe(status=>{if(roomChannel!==channel||!active)return;realtimeReady=status==='SUBSCRIBED';if(realtimeReady){void refresh();void window.TheaterLive?.refresh();}});
+ }
  function roomClient(){return window.CloudSave?.getUser()?window.CloudSave.getClient():guestClient;}
  function roomUser(){return window.CloudSave?.getUser()||guestUser;}
  async function ensureIdentity(){
@@ -70,8 +81,9 @@ window.Theater = (() => {
  async function refresh(){
   if(!active)return;
   const user=roomUser(),client=roomClient(),currentEpoch=epoch,request=++refreshNumber;
-  if(!user||!client){void ensureIdentity().catch(()=>{});account=null;rows=[];seat=null;connected=false;window.Theater3D?.stop();renderSeats();say('Đang kết nối phiên khách để vào phòng chung…');return;}
+  if(!user||!client){void ensureIdentity().catch(()=>{});account=null;rows=[];seat=null;connected=false;stopRealtime();window.Theater3D?.stop();renderSeats();say('Đang kết nối phiên khách để vào phòng chung…');return;}
   if(account!==user.id){await releaseSeat();account=user.id;seat=null;}
+  connectRealtime(client,user);
   try{
    if(seat&&!busy&&Date.now()-lastBeat>30000){
     const {error}=await client.rpc('choose_theater_seat',{chosen_seat:seat,nickname:String(state.character.name||'Bạn học').slice(0,40)});
@@ -81,7 +93,7 @@ window.Theater = (() => {
    if(currentEpoch!==epoch||request!==refreshNumber||!active)return;
    if(error)throw error;
    rows=data;connected=true;seat=rows.find(row=>row.user_id===account)?.seat||null;if(seat)seatClient=client;renderSeats();
-   if(!seat)say('Phòng chung · Ghế cập nhật mỗi 3 giây. Chọn ghế trống để ngồi.');
+   if(!seat)say(realtimeReady?'Phòng chung · Đang cập nhật trực tiếp. Chọn ghế trống để ngồi.':'Phòng chung · Đang kết nối cập nhật trực tiếp. Chọn ghế trống để ngồi.');
   }catch{if(currentEpoch===epoch){connected=false;renderSeats();say('Chưa kết nối được phòng. Đang thử lại; timer vẫn dùng được.');}}
  }
  function renderTimer(){
@@ -98,10 +110,10 @@ window.Theater = (() => {
   connected=false;renderSeats();renderTimer();
   sceneLoader ||= import('./theater-3d.js').catch(()=>{el('theater-motion-status').textContent='Đang dùng nhân vật 2D; có thể tải lại trang để mở 3D.';});
   void sceneLoader.then(()=>{if(active)window.Theater3D?.sync(rows,account,{confirmed:connected});});
-  void releasePending.then(async()=>{await ensureIdentity();if(active){await refresh();window.TheaterLive?.enter();}}).catch(()=>say('Chưa mở được phiên khách. Hãy thử lại hoặc đăng nhập tài khoản.'));polling=setInterval(()=>{void refresh();},3000);
+  void releasePending.then(async()=>{await ensureIdentity();if(active){await refresh();window.TheaterLive?.enter();}}).catch(()=>say('Chưa mở được phiên khách. Hãy thử lại hoặc đăng nhập tài khoản.'));polling=setInterval(()=>{void refresh();},10000);
  }
  function leave(){
-  if(!active)return;active=false;epoch++;connected=false;clearInterval(polling);document.body.classList.remove('theater-active');releasePending=releaseSeat();window.Theater3D?.stop();window.TheaterLive?.leave();
+  if(!active)return;active=false;epoch++;connected=false;clearInterval(polling);stopRealtime();document.body.classList.remove('theater-active');releasePending=releaseSeat();window.Theater3D?.stop();window.TheaterLive?.leave();
   el('theater-screen').replaceChildren();el('theater-external').hidden=true;
  }
  document.addEventListener('DOMContentLoaded',()=>{
@@ -125,5 +137,5 @@ window.Theater = (() => {
   el('theater-leave-seat').addEventListener('click',()=>{void chooseSeat(null);});
   renderSeats();
  });
- return{getContext:()=>({client:roomClient(),user:roomUser()}),enter,leave,renderTimer,releaseSeat,parseMediaLink,loadMedia,refresh};
+ return{connectionStatus:()=>({realtime:realtimeReady}),getContext:()=>({client:roomClient(),user:roomUser()}),enter,leave,renderTimer,releaseSeat,parseMediaLink,loadMedia,refresh};
 })();

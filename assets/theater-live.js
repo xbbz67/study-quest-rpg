@@ -1,5 +1,5 @@
 ﻿window.TheaterLive=(()=>{
- let current=null,player=null,spotify=null,poll=null,generation=0,epoch=0,request=0,offset=0,active=false,paused=false,spState=null,spUri=null;
+ let current=null,player=null,spotify=null,poll=null,generation=0,epoch=0,request=0,offset=0,active=false,paused=false,spState=null,spUri=null,heartbeatTimer=null,heartbeatBusy=false,lastCorrection=0,networkSeconds=0;
  const sdks={},el=id=>document.getElementById(id),context=()=>Theater.getContext(),status=text=>{el('theater-media-status').textContent=text;};
  function sdk(kind){
   if(kind==='yt'&&window.YT?.Player)return Promise.resolve(YT);
@@ -16,7 +16,7 @@
  function destroy(){try{player?.destroy();}catch{}try{spotify?.destroy();}catch{}player=spotify=spState=null;spUri=null;el('theater-screen').replaceChildren();}
  function single(media){return media.provider==='YouTube'?!new URL(media.src).searchParams.has('list'):/\/(track|episode)\//.test(media.original);}
  async function mount(item){
-  const token=++generation;destroy();paused=false;let durationReported=false;
+  const token=++generation;destroy();paused=false;lastCorrection=0;let durationReported=false;
   const media=Theater.parseMediaLink(item.link);if(!media){status('Link đang phát không hợp lệ.');return;}
   el('theater-external').href=media.original;el('theater-external').hidden=false;
   status(media.provider==='Spotify'?'Đang nghe chung. Spotify có thể yêu cầu đăng nhập; tua đồng bộ phụ thuộc loại nội dung.':'Đang phát chung. Nếu chưa phát, bấm “Vào xem trực tiếp”.');
@@ -39,30 +39,30 @@
   });
  }
  function syncPlayer(force=false){
-  if(!current||paused)return;const host=current.owner===context().user?.id;
+  if(!current||paused)return;const host=current.owner===context().user?.id,canCorrect=force||performance.now()-lastCorrection>4000;
   if(player?.getPlayerState){
    const index=current.playback_index;
    if(index!=null&&player.getPlaylistIndex?.()!==index&&(!host||force)){player.playVideoAt(index);player.seekTo(elapsed(),true);}
-   else if(force||(!host&&player.getPlayerState()===1&&Math.abs(player.getCurrentTime()-elapsed())>4))player.seekTo(elapsed(),true);
+   else if(force||(!host&&player.getPlayerState()===1&&canCorrect&&Math.abs(player.getCurrentTime()-elapsed())>1.2)){player.seekTo(elapsed(),true);lastCorrection=performance.now();}
    if(force)player.playVideo();
   }
   if(spotify){
    if(current.playback_uri&&spUri!==current.playback_uri&&(!host||force)){spUri=current.playback_uri;spotify.loadEntity(spUri,false,Math.floor(elapsed()));spotify.play();}
-   else if(force||(!host&&spState&&!spState.isPaused&&Math.abs(spState.position/1000-elapsed())>4))spotify.seek(Math.floor(elapsed()));
+   else if(force||(!host&&spState&&!spState.isPaused&&canCorrect&&Math.abs(spState.position/1000-elapsed())>1.5)){spotify.seek(Math.floor(elapsed()));lastCorrection=performance.now();}
    if(force)spotify.play();
   }
  }
  async function heartbeat(){
-  if(!current||paused||current.owner!==context().user?.id)return;let position=null,index=null,uri=null;
+  if(!current||paused||heartbeatBusy||current.owner!==context().user?.id)return;let position=null,index=null,uri=null;
   if(player?.getPlayerState?.()===1){position=player.getCurrentTime();index=player.getPlaylist?.()?.length?player.getPlaylistIndex():null;}
   if(spotify&&spState&&!spState.isPaused&&!spState.isBuffering){position=spState.position/1000;uri=spState.playingURI||null;}
-  if(Number.isFinite(position))await context().client.rpc('theater_heartbeat',{expected_id:current.id,position_seconds:position,playlist_index:index,playing_uri:uri});
+  if(Number.isFinite(position)){heartbeatBusy=true;try{await context().client.rpc('theater_heartbeat',{expected_id:current.id,position_seconds:position+networkSeconds,playlist_index:index,playing_uri:uri});}finally{heartbeatBusy=false;}}
  }
  async function refresh(){
   if(!active)return;const captured=epoch,n=++request,{client,user}=context();if(!client||!user)return;
   const start=Date.now(),{data:snapshot,error}=await client.rpc('theater_snapshot');if(!active||captured!==epoch||n!==request)return;
   if(error){status('Chưa tải được màn hình chung; đang thử lại.');return;}
-  offset=((start+Date.now())/2-Date.parse(snapshot.server_time))/1000;
+  networkSeconds=Math.min(1,(Date.now()-start)/2000);offset=((start+Date.now())/2-Date.parse(snapshot.server_time))/1000;
   const data=snapshot.items,now=data.find(row=>row.status==='playing')||null,changed=now?.id!==current?.id;current=now;
   el('theater-queue').replaceChildren(...data.filter(row=>row.status==='waiting').map(row=>{const li=document.createElement('li');li.textContent=row.link;return li;}));
   el('theater-next').disabled=!now||now.owner!==user.id;
@@ -78,8 +78,11 @@
  async function next(){if(!current)return;const {client}=context(),{error}=await client.rpc('theater_next',{expected_id:current.id});if(!error)await refresh();}
  function joinLive(){paused=false;if(current&&!player&&!spotify){void mount(current).catch(()=>status('Chưa tải được player. Kiểm tra kết nối rồi thử lại.'));return;}syncPlayer(true);}
  function pauseLocal(){paused=true;player?.pauseVideo();spotify?.pause();status('Đã tạm dừng trên máy bạn. Bấm “Vào xem trực tiếp” để bắt kịp phòng.');}
- function enter(){active=true;epoch++;void refresh();clearInterval(poll);poll=setInterval(()=>{void heartbeat().then(refresh).catch(()=>{});},3000);}
- function leave(){active=false;epoch++;clearInterval(poll);generation++;current=null;destroy();}
+ function resumeConnection(){if(active)void refresh();}
+ function enter(){active=true;epoch++;void refresh();clearInterval(poll);clearInterval(heartbeatTimer);poll=setInterval(()=>{void refresh();},6000);heartbeatTimer=setInterval(()=>{void heartbeat().catch(()=>{});},1000);}
+ function leave(){active=false;epoch++;clearInterval(poll);clearInterval(heartbeatTimer);generation++;current=null;destroy();}
  document.addEventListener('DOMContentLoaded',()=>{el('theater-next').addEventListener('click',()=>{void next();});el('theater-join-live').addEventListener('click',joinLive);});
+ window.addEventListener('online',resumeConnection);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)resumeConnection();});
  return{enter,leave,refresh,enqueue,joinLive,pauseLocal};
 })();

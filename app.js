@@ -687,6 +687,7 @@ function tickTimer() {
   if (secondsAccumulator >= 60) {
     secondsAccumulator = 0;
     state.totalMinutesStudied += 1;
+    void window.Leaderboard?.report()?.catch(() => {});
     
     // Live accumulation: 10 EXP + 2 Gold per minute
     addExp(10, 'per_minute');
@@ -1567,7 +1568,7 @@ function escapeHtml(str) {
 
 // Tab Switching
 function switchTab(tabId) {
-  const tabs = ['tab-timer', 'tab-quests', 'tab-ranks', 'tab-shop', 'tab-logs', 'tab-theater'];
+  const tabs = ['tab-timer', 'tab-quests', 'tab-ranks', 'tab-shop', 'tab-logs', 'tab-leaderboard', 'tab-theater'];
   tabs.forEach(t => {
     const el = document.getElementById(t);
     if (el) el.classList.add('hidden');
@@ -1587,6 +1588,8 @@ function switchTab(tabId) {
   if (tabId === 'tab-quests') renderQuests();
   if (tabId === 'tab-ranks') renderRankMilestones();
   if (tabId === 'tab-shop') renderShop();
+  if (tabId === 'tab-leaderboard') void window.Leaderboard?.enter();
+  else window.Leaderboard?.leave();
   if (tabId === 'tab-theater') window.Theater?.enter();
   else window.Theater?.leave();
 }

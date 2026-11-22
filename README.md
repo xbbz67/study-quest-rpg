@@ -160,3 +160,7 @@ Khi chưa đăng nhập, website yêu cầu chọn đăng nhập hoặc tiếp t
 Khách quay lại được nhận diện qua phiên riêng trên trình duyệt; tiến độ khách vẫn lưu local, tài khoản đăng nhập dùng cloud như trước. Khi tài khoản đăng nhập lần đầu vào Theater, tên hồ sơ hợp lệ được đăng ký hoặc yêu cầu chọn lại nếu trùng/mặc định. Tên khách không hoạt động 30 ngày có thể được dùng lại; tên tài khoản được giữ.
 
 Áp dụng migration `20261122010000_guest_names.sql` trước khi triển khai frontend. Các RPC phòng hiện kiểm tra danh tính đã đặt tên; bản RPC cũ được đổi tên và thu hồi quyền gọi trực tiếp. Nhả ghế vẫn được phép khi chưa có tên, để khách cũ có thể rời phòng.
+
+### Leaderboard thời gian tập trung
+
+Bảng xếp hạng ưu tiên nhóm tài khoản đăng nhập, sau đó nhóm khách; mỗi nhóm sắp theo thời gian giảm dần. Tài khoản lấy tổng tích lũy nhiều ngày (bao gồm tổng phút đã lưu cloud trước đây). Khách chỉ hiển thị thời gian của ngày hiện tại theo Asia/Ho_Chi_Minh, ngày mới về 0 và chỉ xuất hiện lại sau khi học. Timer chính và Theater cùng ghi nhận thời gian tập trung; nghỉ/pause không được tính. Báo cáo theo tổng trong ngày, lấy max để tránh cộng trùng khi gửi lại. Cập nhật mỗi 30 giây hoặc bấm Làm mới.

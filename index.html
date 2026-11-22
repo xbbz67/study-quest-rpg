@@ -388,6 +388,7 @@
       <button onclick="switchTab('tab-logs')" data-tab="tab-logs" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
         <span>📊</span> Lịch Sử & Thống Kê
       </button>
+    <button type="button" onclick="switchTab('tab-leaderboard')" data-tab="tab-leaderboard" class="nav-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-400">🏆 Leaderboard</button>
     <button type="button" onclick="switchTab('tab-theater')" data-tab="tab-theater" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white">🎬 Theater</button>
     </div>
 
@@ -635,6 +636,7 @@
 
     </div>
 
+    <section id="tab-leaderboard" class="hidden rpg-card rounded-3xl p-6 space-y-4"><div class="flex justify-between items-center gap-3"><div><p class="text-xs text-indigo-300">FOCUS TOGETHER</p><h2 class="text-2xl font-bold mt-2">🏆 Bảng xếp hạng tập trung</h2></div><button id="leaderboard-refresh" class="px-4 py-2 rounded-xl bg-indigo-600 text-sm" type="button">Làm mới</button></div><p class="text-sm text-slate-400">Tài khoản đăng nhập được xếp trước, tính tổng thời gian tích lũy. Khách chỉ tính hôm nay, sang ngày mới bắt đầu lại từ 0. Thời gian nghỉ không tính.</p><p id="leaderboard-day" class="text-xs text-indigo-300"></p><div class="leaderboard-scroll"><table class="leaderboard-table"><thead><tr><th>Hạng</th><th>Người học</th><th>Hình thức</th><th>Tập trung</th></tr></thead><tbody id="leaderboard-rows"></tbody></table></div><p id="leaderboard-status" role="status" class="text-sm text-slate-400">Đang tải…</p></section>
     <div id="tab-theater" class="hidden space-y-6">
       <div class="theater-heading"><div><p class="theater-eyebrow">STUDY TOGETHER</p><h2>Theater</h2><p>Một chỗ ngồi, một khoảng tập trung. Cùng học trong rạp nhỏ của chúng mình.</p></div><button type="button" onclick="switchTab('tab-timer')">← Trở về timer</button></div>
       <div class="theater-layout">
@@ -896,6 +898,7 @@
   <script src="assets/theater-chat.js"></script>
   <script src="assets/timer-decor.js"></script>
   <script src="assets/entry-gate.js"></script>
+  <script src="assets/leaderboard.js"></script>
   <script src="app.js"></script>
   <script>
     function openAddQuestModal() {

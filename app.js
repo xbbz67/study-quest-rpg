@@ -84,7 +84,8 @@ const DEFAULT_STATE = {
   settings: {
     sound: true,
     ambient: 'off',
-    ambientVolume: 0.3
+    ambientVolume: 0.3,
+    timerDecoration: 'orbit'
   }
 };
 
@@ -764,7 +765,6 @@ function updateTimerUI() {
   window.Theater?.renderTimer();
   const timerDisplay = document.getElementById('timer-display');
   const timerStatus = document.getElementById('timer-status');
-  const timerCircle = document.getElementById('timer-progress-ring');
   const startBtn = document.getElementById('btn-timer-start');
   const pauseBtn = document.getElementById('btn-timer-pause');
   const resetBtn = document.getElementById('btn-timer-reset');
@@ -776,21 +776,9 @@ function updateTimerUI() {
   if (currentTimerMode === 'STOPWATCH') {
     minutes = Math.floor(stopwatchSeconds / 60);
     seconds = stopwatchSeconds % 60;
-    if (timerCircle) {
-      // Just keep full ring for stopwatch
-      timerCircle.style.strokeDashoffset = 0;
-    }
   } else {
     minutes = Math.floor(timeRemaining / 60);
     seconds = timeRemaining % 60;
-
-    if (timerCircle && totalSessionSeconds > 0) {
-      const radius = 130;
-      const circumference = 2 * Math.PI * radius;
-      const progress = (totalSessionSeconds - timeRemaining) / totalSessionSeconds;
-      const offset = circumference - (progress * circumference);
-      timerCircle.style.strokeDashoffset = offset;
-    }
   }
 
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -802,23 +790,25 @@ function updateTimerUI() {
   // Status text and glow
   if (timerStatus) {
     if (timerState === 'RUNNING' && !isBreakSession) {
-      timerStatus.innerText = '🔥 ĐANG TẬP TRUNG HỌC TẬP';
+      timerStatus.innerText = 'Đang tập trung';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-amber-400 animate-pulse';
       timerContainer?.classList.add('timer-active-glow');
     } else if (timerState === 'BREAK' || (timerState === 'RUNNING' && isBreakSession)) {
-      timerStatus.innerText = '☕ ĐANG GIẢI LAO THƯ GIÃN';
+      timerStatus.innerText = 'Giờ giải lao';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-emerald-400 animate-pulse';
       timerContainer?.classList.remove('timer-active-glow');
     } else if (timerState === 'PAUSED') {
-      timerStatus.innerText = '⏸️ ĐANG TẠM DỪNG';
+      timerStatus.innerText = 'Đang tạm dừng';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-slate-400';
       timerContainer?.classList.remove('timer-active-glow');
     } else {
-      timerStatus.innerText = 'READY TO FOCUS';
+      timerStatus.innerText = 'Sẵn sàng';
       timerStatus.className = 'text-xs uppercase tracking-widest font-bold text-slate-500';
       timerContainer?.classList.remove('timer-active-glow');
     }
   }
+
+  window.TimerDecor?.render();
 
   // Buttons visibility
   if (startBtn && pauseBtn) {
@@ -1265,6 +1255,7 @@ function renderStreakTree() {
 }
 
 function renderHUD() {
+  window.TimerDecor?.render();
   renderStreakTree();
   const currentRank = getCurrentRank(state.level);
   const nextRank = getNextRank(state.level);

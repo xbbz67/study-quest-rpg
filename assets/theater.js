@@ -101,7 +101,7 @@ window.Theater = (() => {
   if(!el('theater-timer'))return;
   const seconds=currentTimerMode==='STOPWATCH'?stopwatchSeconds:timeRemaining;
   el('theater-timer').textContent=`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-  el('theater-timer-label').textContent=isBreakSession?'Đang nghỉ giải lao':`${TIMER_MODES[currentTimerMode].label} · ${timerState==='RUNNING'?'Đang tập trung':timerState==='PAUSED'?'Tạm dừng':'Sẵn sàng'}`;
+  el('theater-timer-label').textContent=isBreakSession?'Giờ giải lao':timerState==='RUNNING'?'Đang tập trung':timerState==='PAUSED'?'Tạm dừng':'Sẵn sàng';
   el('theater-start').hidden=timerState==='RUNNING';el('theater-pause').hidden=timerState!=='RUNNING';
  }
  function enter(){

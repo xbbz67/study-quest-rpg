@@ -148,3 +148,7 @@ Người gửi video đang phát là host: YouTube hiện thanh thời gian và 
 Tích lũy đủ 30 phút tập trung trong cùng ngày để nhận tối đa một ngày streak. Tất cả chế độ timer, kể cả Stopwatch và nhiều phiên ngắn, cùng đóng góp. Giờ nghỉ và thời gian pause không tính. Sau khi mất chuỗi, đủ 30 phút bắt đầu lại từ 1 ngày; vật phẩm đóng băng vẫn theo quy tắc cũ. Khi tải local hoặc áp dụng cloud save, hệ thống kiểm tra lại thời gian đã ghi cho hôm nay để khôi phục ngày chưa được cộng, không cộng trùng hay dùng thời gian của hôm qua.
 
 Kiểm thử: `node assets/tests/streak-restart.cjs`.
+
+### Đồng hồ tròn và trang trí
+
+Timer chính, Zen và Theater dùng mặt đồng hồ tròn SVG. Đếm ngược hiển thị phần thời gian còn lại; Stopwatch hiển thị tiến độ hướng tới mốc 30 phút. Có bốn trang trí miễn phí: Quỹ đạo, Khu vườn, Ánh trăng, Tối giản. Chọn ở Góc tập trung hoặc ô Trang trí đồng hồ trong Theater. Lựa chọn lưu trong `settings.timerDecoration`, dùng chung cơ chế lưu local/cloud; đổi trang trí không dừng hay reset phiên học. Zen ẩn bảng chọn để gọn giao diện; hỗ trợ reduced motion. Khung nhạc mở rộng nằm dưới timer ở chế độ thường để không che bảng chọn trang trí, vẫn giữ bố cục riêng của Zen.

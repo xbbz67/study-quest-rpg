@@ -453,61 +453,7 @@
         <p id="timer-duration-message" class="timer-duration-message" role="status" aria-live="polite"></p>
       </section>
 
-      <!-- Huge Timer Display & Circular Ring -->
-      <div id="timer-panel" class="rpg-card rounded-3xl p-8 lg:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center">
-        
-        <div id="timer-container" class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center mb-6 transition-all duration-300">
-          
-          <!-- SVG Circular Progress Ring -->
-          <svg class="w-full h-full -rotate-90 transform" viewBox="0 0 300 300">
-            <!-- Background circle -->
-            <circle
-              cx="150" cy="150" r="130"
-              fill="transparent"
-              stroke="rgba(30, 41, 59, 0.6)"
-              stroke-width="14"
-            />
-            <!-- Progress circle -->
-            <circle
-              id="timer-progress-ring"
-              cx="150" cy="150" r="130"
-              fill="transparent"
-              stroke="url(#timerGradient)"
-              stroke-width="14"
-              stroke-linecap="round"
-              stroke-dasharray="816.8"
-              stroke-dashoffset="0"
-              class="timer-ring-circle"
-            />
-            <defs>
-              <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#6366f1" />
-                <stop offset="50%" stop-color="#a855f7" />
-                <stop offset="100%" stop-color="#f59e0b" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          <!-- Inside Ring Content -->
-          <div class="absolute flex flex-col items-center justify-center">
-            <div id="timer-status" class="text-xs uppercase tracking-widest font-bold text-slate-500 mb-1">
-              READY TO FOCUS
-            </div>
-            <div id="timer-display" class="font-mono text-5xl sm:text-6xl font-black tracking-tight text-white drop-shadow-md">
-              25:00
-            </div>
-            <div class="text-xs font-semibold text-slate-400 mt-2 flex items-center gap-1.5">
-              <span>Tích lũy:</span>
-              <span class="text-indigo-400 font-bold">+10 EXP/phút</span>
-              <span>•</span>
-              <span class="text-yellow-400 font-bold">+2 🪙/phút</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Control Action Buttons -->
-        <div id="timer-actions" class="flex items-center gap-4">
+      <section id="timer-panel" class="rpg-card timer-studio" aria-label="Góc tập trung"><div class="timer-workspace"><div class="timer-focus-space"><div class="timer-scene-heading"><span class="timer-scene-live-dot"></span> MỘT KHOẢNG THỜI GIAN CHO BẠN</div><div id="timer-container" class="timer-orb" data-timer-orb data-decoration="orbit" data-state="idle"><div class="timer-orb-face" aria-hidden="true"></div><svg class="timer-orb-rings" viewBox="0 0 320 320" aria-hidden="true" focusable="false"><circle class="timer-orb-ticks" cx="160" cy="160" r="147"/><circle class="timer-orb-track" cx="160" cy="160" r="130"/><circle id="timer-progress-ring" class="timer-orb-progress" data-timer-ring cx="160" cy="160" r="130"/></svg><div class="timer-orb-pointer" aria-hidden="true"></div><div class="timer-decoration-art" aria-hidden="true"></div><div class="timer-orb-center"><span class="timer-orb-mode" data-timer-mode-label>Pomodoro</span><div id="timer-display" class="timer-orb-time" role="timer" aria-live="off">25:00</div><p id="timer-status" class="timer-orb-status">Sẵn sàng</p><div class="timer-orb-rewards"><span>+10 EXP</span><i>·</i><span>+2 vàng / phút</span></div></div><div class="sr-only" data-timer-progress role="progressbar" aria-label="Tiến độ đồng hồ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"></div></div>        <div id="timer-actions" class="flex items-center gap-4">
           <button id="btn-timer-start" onclick="startTimer()" class="rpg-btn px-8 py-3.5 rounded-2xl text-base font-extrabold tracking-wide uppercase bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:from-indigo-400 hover:to-indigo-500 text-white shadow-xl shadow-indigo-600/40 flex items-center gap-2">
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             Bắt Đầu Cày Cấp
@@ -523,12 +469,7 @@
           </button>
         </div>
 
-        <!-- Motivation Banner -->
-        <div class="mt-8 text-xs text-slate-400 max-w-md mx-auto">
-          💡 <span class="text-slate-300 font-semibold">Lời khuyên chiến binh:</span> Đặt điện thoại ở chế độ im lặng, tập trung trọn vẹn trong 25 phút. Mỗi phút bạn ngồi vào bàn học là một bước tiến gần hơn đến Rank Cao Thủ!
-        </div>
-
-      </div>
+<p class="timer-scene-footnote">Từng phút nhỏ. Một bước tiến dài.</p></div><aside class="timer-decoration-panel" aria-labelledby="timer-decoration-heading"><p class="timer-decoration-eyebrow">MAKE IT YOURS</p><h3 id="timer-decoration-heading">Góc tập trung</h3><p class="timer-decoration-intro">Một chút trang trí, một nhịp học của riêng bạn.</p><div id="timer-decoration-options" class="timer-decoration-options" role="group" aria-label="Chọn trang trí đồng hồ"></div><div class="timer-decoration-note"><span aria-hidden="true">✧</span><p id="timer-decoration-note"></p></div><p class="timer-decoration-save">Lựa chọn được lưu cùng hồ sơ của bạn.</p></aside></div></section>
 
     </div>
 
@@ -718,7 +659,7 @@
           <div class="theater-legend"><span>🟤 Trống</span><span>🟡 Có người</span><span>🟢 Ghế của bạn</span><strong id="theater-occupancy">0/48 ghế</strong></div>
         </section>
         <aside class="theater-sidebar">
-          <section class="theater-card"><p class="theater-eyebrow">PHIÊN HỌC CỦA BẠN</p><div id="theater-timer" class="theater-timer">25:00</div><p id="theater-timer-label"></p><div class="theater-controls"><button id="theater-start" onclick="startTimer()">▶ Bắt đầu</button><button id="theater-pause" onclick="pauseTimer()" hidden>Ⅱ Tạm dừng</button><button onclick="resetTimer()">↺ Đặt lại</button></div><label for="theater-duration">Thời gian tập trung</label><select id="theater-duration" onchange="applyCustomTimerDuration(this.value)"><option value="">Chọn số phút…</option><option>5</option><option>10</option><option>15</option><option>25</option><option>30</option><option>45</option><option>50</option><option>60</option><option>90</option><option>120</option></select><p class="theater-small">Timer dùng chung với chế độ Focus. EXP, nhiệm vụ và streak vẫn được tính như bình thường.</p></section>
+          <section class="theater-card"><p class="theater-eyebrow">PHIÊN HỌC CỦA BẠN</p><div id="theater-timer-orb" class="timer-orb timer-orb-compact" data-timer-orb data-decoration="orbit" data-state="idle"><div class="timer-orb-face" aria-hidden="true"></div><svg class="timer-orb-rings" viewBox="0 0 320 320" aria-hidden="true" focusable="false"><circle class="timer-orb-ticks" cx="160" cy="160" r="147"/><circle class="timer-orb-track" cx="160" cy="160" r="130"/><circle  class="timer-orb-progress" data-timer-ring cx="160" cy="160" r="130"/></svg><div class="timer-orb-pointer" aria-hidden="true"></div><div class="timer-decoration-art" aria-hidden="true"></div><div class="timer-orb-center"><span class="timer-orb-mode" data-timer-mode-label>Pomodoro</span><div id="theater-timer" class="timer-orb-time" role="timer" aria-live="off">25:00</div><p id="theater-timer-label" class="timer-orb-status">Sẵn sàng</p></div><div class="sr-only" data-timer-progress role="progressbar" aria-label="Tiến độ đồng hồ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"></div></div><div class="theater-controls"><button id="theater-start" onclick="startTimer()">▶ Bắt đầu</button><button id="theater-pause" onclick="pauseTimer()" hidden>Ⅱ Tạm dừng</button><button onclick="resetTimer()">↺ Đặt lại</button></div><label for="theater-decoration">Trang trí đồng hồ</label><select id="theater-decoration" data-timer-decoration-select aria-label="Trang trí đồng hồ trong Theater"></select><label for="theater-duration">Thời gian tập trung</label><select id="theater-duration" onchange="applyCustomTimerDuration(this.value)"><option value="">Chọn số phút…</option><option>5</option><option>10</option><option>15</option><option>25</option><option>30</option><option>45</option><option>50</option><option>60</option><option>90</option><option>120</option></select><p class="theater-small">Timer dùng chung với chế độ Focus. EXP, nhiệm vụ và streak vẫn được tính như bình thường.</p></section>
           <section class="theater-card"><h3>Màn hình chung</h3><p id="theater-room-playback" class="theater-playback-state" role="status">Chưa có nội dung</p><button id="theater-shared-toggle" class="theater-shared-toggle" type="button" disabled>Ⅱ Tạm dừng cả phòng</button><p id="theater-control-hint" class="theater-small">Người thêm link đang phát điều khiển phát / tạm dừng chung.</p><button id="theater-join-live" type="button">▶ Vào xem trực tiếp</button><button id="theater-next" type="button" disabled>Chuyển link tiếp theo</button><h4>Hàng chờ</h4><ol id="theater-queue" style="font-size:11px;overflow-wrap:anywhere;max-height:160px;overflow:auto"></ol><form id="theater-media-form"><label for="theater-link">Link YouTube / Spotify</label><input id="theater-link" type="url" required placeholder="https://www.youtube.com/watch?v=…"><button type="submit">Thêm vào phòng / hàng chờ</button></form><p id="theater-media-status" role="status" class="theater-small">Link đầu phát chung. Link tiếp theo vào hàng chờ; người vào sau bắt kịp vị trí đang phát.</p><div class="theater-controls"><button id="theater-stop-media" type="button">Chỉ tạm dừng máy tôi</button><a id="theater-external" href="#" target="_blank" rel="noopener noreferrer" hidden>Mở bản gốc ↗</a></div></section>
           <section class="theater-card theater-chat-card" aria-label="Chat phòng học"><div class="theater-chat-heading"><h3>💬 Chat trong phòng</h3><span>Khách cũng trò chuyện được</span></div><p id="theater-chat-status" class="theater-small" role="status">Đang kết nối phòng chat…</p><div id="theater-chat-list" class="theater-chat-list" role="log" aria-live="polite" aria-relevant="additions" aria-label="Tin nhắn trong phòng" tabindex="0"></div><p id="theater-chat-empty" class="theater-small">Chào mọi người bằng một tin nhắn nhé.</p><button id="theater-chat-new" type="button" hidden>Tin mới ↓</button><form id="theater-chat-form" class="theater-chat-form"><label for="theater-chat-input">Tin nhắn cho cả phòng</label><div><input id="theater-chat-input" type="text" maxlength="500" required autocomplete="off" placeholder="Chúc mọi người học tốt…"><button id="theater-chat-send" type="submit" disabled>Gửi ↗</button></div></form><p class="theater-small">Tối đa 500 ký tự · Hiển thị 80 tin gần nhất. Chỉ hiển thị tin trong 7 ngày gần nhất.</p></section>
           <section class="theater-card"><h3 id="theater-my-seat">Chọn một ghế để ngồi học</h3><p id="theater-status" role="status" class="theater-small"></p><button id="theater-leave-seat" type="button" disabled>Rời ghế</button><p class="theater-small">Trong phòng, mọi người thấy tên hồ sơ và vị trí ghế của bạn. Ghế tự giải phóng sau tối đa 2 phút mất kết nối.</p><p id="theater-people" class="theater-small"></p></section>
@@ -952,6 +893,7 @@
   <script src="assets/theater.js"></script>
   <script src="assets/theater-live.js"></script>
   <script src="assets/theater-chat.js"></script>
+  <script src="assets/timer-decor.js"></script>
   <script src="app.js"></script>
   <script>
     function openAddQuestModal() {

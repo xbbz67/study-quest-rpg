@@ -886,6 +886,7 @@
     <p id="cloud-message" role="status" class="text-xs leading-relaxed text-amber-200 mt-4"></p>
   </dialog>
 
+  <dialog id="entry-dialog" aria-labelledby="entry-title" aria-describedby="entry-intro"><div class="entry-mark" aria-hidden="true">✦</div><p class="entry-eyebrow">STUDY RPG · MỘT GÓC HỌC CỦA BẠN</p><h2 id="entry-title">Bắt đầu theo cách của bạn</h2><p id="entry-intro">Đăng nhập để đồng bộ tiến độ, hoặc chọn một tên riêng để học bằng tài khoản khách.</p><div id="entry-choices"><button id="entry-login" type="button" class="entry-primary">☁ Đăng nhập / tạo tài khoản</button><button id="entry-guest" type="button" class="entry-secondary">Tiếp tục bằng tài khoản khách ↗</button><p class="entry-footnote">Tài khoản khách lưu tiến độ trên máy này. Đăng nhập để mang tiến độ sang thiết bị khác.</p></div><form id="entry-name-form" hidden><label for="entry-name">Tên hiển thị của bạn</label><input id="entry-name" name="nickname" type="text" minlength="2" maxlength="24" required autocomplete="nickname" placeholder="Ví dụ: Mây Nhỏ, Minh_07…" aria-describedby="entry-name-help entry-message"><p id="entry-name-help" class="entry-footnote">2–24 ký tự · Không trùng tên người khác · Không dùng “Chiến Thần VNU”.</p><button id="entry-submit" type="submit" class="entry-primary">Dùng tên này · Vào Study RPG</button><button id="entry-back" type="button" class="entry-back">← Chọn cách khác</button></form><p id="entry-message" role="status" aria-live="polite"></p><button id="entry-close" type="button" class="entry-back" hidden>← Trở về timer</button></dialog>
   <!-- Scripts -->
   <script src="assets/supabase.js"></script>
   <script src="assets/cloud-config.js"></script>
@@ -894,6 +895,7 @@
   <script src="assets/theater-live.js"></script>
   <script src="assets/theater-chat.js"></script>
   <script src="assets/timer-decor.js"></script>
+  <script src="assets/entry-gate.js"></script>
   <script src="app.js"></script>
   <script>
     function openAddQuestModal() {

@@ -1269,7 +1269,7 @@ function renderHUD() {
   const avatarContainer = document.getElementById('char-avatar-container');
   const petBadgeEl = document.getElementById('char-pet-badge');
 
-  if (nameEl) nameEl.innerText = state.character.name;
+  if (nameEl) nameEl.innerText = window.EntryGate?.displayName() || state.character.name;
   if (titleEl) titleEl.innerText = state.character.title;
   if (avatarEl) avatarEl.innerText = state.character.avatar;
 
@@ -1456,10 +1456,12 @@ function closeRankUpModal() {
 }
 
 // Edit Character Profile
-function promptEditProfile() {
-  const newName = prompt("Nhập tên Chiến Binh của bạn:", state.character.name);
+async function promptEditProfile() {
+  const newName = prompt("Nhập tên Chiến Binh của bạn:", (window.EntryGate?.displayName() || state.character.name));
   if (newName && newName.trim()) {
-    state.character.name = newName.trim();
+    const verifiedName = await window.EntryGate?.rename(newName);
+    if (!verifiedName) return;
+    state.character.name = verifiedName;
   }
   const avatars = ['🧙‍♂️', '⚔️', '🏹', '🛡️', '🧠', '🦉', '🚀', '🔥', '⚡', '👑'];
   const newAvatar = prompt(`Chọn biểu tượng Avatar (${avatars.join(' ')}):`, state.character.avatar);
@@ -1665,8 +1667,10 @@ window.addEventListener('DOMContentLoaded', () => {
       checkBuffExpiration();
       saveGameState();
       renderHUD(); renderQuests(); renderShop(); renderRankMilestones();
+      setTimeout(() => window.EntryGate?.accountChanged(), 0);
     }
-  }).catch(error => {
+  }).then(() => window.EntryGate?.boot()).catch(error => {
+    window.EntryGate?.boot();
     console.error('Cloud initialization failed:', error);
     document.querySelector('main').inert = false;
     const indicator = document.getElementById('cloud-status');

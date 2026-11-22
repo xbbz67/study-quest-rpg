@@ -80,9 +80,9 @@ window.Theater = (() => {
   if(client){try{await client.rpc('choose_theater_seat',{chosen_seat:null,nickname:'Bạn học'});}catch{}}
  }
  async function refresh(){
-  if(!active)return;
+  if(!active||!window.EntryGate?.isRoomReady())return;
   const user=roomUser(),client=roomClient(),currentEpoch=epoch,request=++refreshNumber;
-  if(!user||!client){void ensureIdentity().catch(()=>{});account=null;rows=[];seat=null;connected=false;stopRealtime();window.Theater3D?.stop();renderSeats();say('Đang kết nối phiên khách để vào phòng chung…');return;}
+  if(!user||!client){account=null;rows=[];seat=null;connected=false;stopRealtime();window.Theater3D?.stop();renderSeats();say('Đang kết nối phiên khách để vào phòng chung…');return;}
   if(account!==user.id){await releaseSeat();account=user.id;seat=null;}
   connectRealtime(client,user);
   try{
@@ -111,7 +111,7 @@ window.Theater = (() => {
   connected=false;renderSeats();renderTimer();
   sceneLoader ||= import('./theater-3d.js').catch(()=>{el('theater-motion-status').textContent='Đang dùng nhân vật 2D; có thể tải lại trang để mở 3D.';});
   void sceneLoader.then(()=>{if(active)window.Theater3D?.sync(rows,account,{confirmed:connected});});
-  void releasePending.then(async()=>{await ensureIdentity();if(active){await refresh();window.TheaterLive?.enter();window.TheaterChat?.enter();window.TheaterChat?.setConnection(realtimeReady);}}).catch(()=>say('Chưa mở được phiên khách. Hãy thử lại hoặc đăng nhập tài khoản.'));polling=setInterval(()=>{void refresh();void window.TheaterChat?.refresh();},10000);
+  void releasePending.then(async()=>{if(!await window.EntryGate.ensureRoom())return;if(active){await refresh();window.TheaterLive?.enter();window.TheaterChat?.enter();window.TheaterChat?.setConnection(realtimeReady);}}).catch(()=>say('Chưa mở được phiên khách. Hãy thử lại hoặc đăng nhập tài khoản.'));polling=setInterval(()=>{void refresh();void window.TheaterChat?.refresh();},10000);
  }
  function leave(){
   if(!active)return;active=false;epoch++;connected=false;clearInterval(polling);stopRealtime();document.body.classList.remove('theater-active');releasePending=releaseSeat();window.Theater3D?.stop();window.TheaterLive?.leave();window.TheaterChat?.leave();
@@ -138,5 +138,5 @@ window.Theater = (() => {
   el('theater-leave-seat').addEventListener('click',()=>{void chooseSeat(null);});
   renderSeats();
  });
- return{connectionStatus:()=>({realtime:realtimeReady}),getContext:()=>({client:roomClient(),user:roomUser()}),enter,leave,renderTimer,releaseSeat,parseMediaLink,loadMedia,refresh};
+ return{prepareGuest:async()=>{await ensureIdentity();return{client:roomClient(),user:roomUser()};},connectionStatus:()=>({realtime:realtimeReady}),getContext:()=>({client:roomClient(),user:roomUser()}),enter,leave,renderTimer,releaseSeat,parseMediaLink,loadMedia,refresh};
 })();

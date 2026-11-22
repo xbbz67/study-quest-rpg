@@ -152,3 +152,11 @@ Kiểm thử: `node assets/tests/streak-restart.cjs`.
 ### Đồng hồ tròn và trang trí
 
 Timer chính, Zen và Theater dùng mặt đồng hồ tròn SVG. Đếm ngược hiển thị phần thời gian còn lại; Stopwatch hiển thị tiến độ hướng tới mốc 30 phút. Có bốn trang trí miễn phí: Quỹ đạo, Khu vườn, Ánh trăng, Tối giản. Chọn ở Góc tập trung hoặc ô Trang trí đồng hồ trong Theater. Lựa chọn lưu trong `settings.timerDecoration`, dùng chung cơ chế lưu local/cloud; đổi trang trí không dừng hay reset phiên học. Zen ẩn bảng chọn để gọn giao diện; hỗ trợ reduced motion. Khung nhạc mở rộng nằm dưới timer ở chế độ thường để không che bảng chọn trang trí, vẫn giữ bố cục riêng của Zen.
+
+### Đăng nhập hoặc tài khoản khách có tên riêng
+
+Khi chưa đăng nhập, website yêu cầu chọn đăng nhập hoặc tiếp tục bằng khách. Khách xác nhận tên 2–24 ký tự trước khi vào; không nhận tên mặc định “Chiến Thần VNU”. Tên được chuẩn hóa Unicode NFKC, khoảng trắng và hoa/thường, được giữ duy nhất bằng constraint trong database. Tên gắn với Supabase user ID, không tin nickname gửi từ trình duyệt. Cùng một tên dùng cho hồ sơ, ghế và chat; đổi tên có kiểm tra trùng và cập nhật ghế đang ngồi.
+
+Khách quay lại được nhận diện qua phiên riêng trên trình duyệt; tiến độ khách vẫn lưu local, tài khoản đăng nhập dùng cloud như trước. Khi tài khoản đăng nhập lần đầu vào Theater, tên hồ sơ hợp lệ được đăng ký hoặc yêu cầu chọn lại nếu trùng/mặc định. Tên khách không hoạt động 30 ngày có thể được dùng lại; tên tài khoản được giữ.
+
+Áp dụng migration `20261122010000_guest_names.sql` trước khi triển khai frontend. Các RPC phòng hiện kiểm tra danh tính đã đặt tên; bản RPC cũ được đổi tên và thu hồi quyền gọi trực tiếp. Nhả ghế vẫn được phép khi chưa có tên, để khách cũ có thể rời phòng.

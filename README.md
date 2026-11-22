@@ -142,3 +142,9 @@ Realtime Theater: áp dụng `20261120020000_theater_realtime.sql` và `20261120
 ### Quyền timeline theo video
 
 Người gửi video đang phát là host: YouTube hiện thanh thời gian và phím tua cho host. Người xem dùng `controls=0`, `disablekb=1`; các nút điều khiển chung ở sidebar cũng được ẩn. Chủ quyền tự đổi theo người gửi video tiếp theo và player được tạo lại khi danh tính đổi. Tua được gửi bằng RPC `theater_control` với action `seek`, kiểm tra owner và revision trên server. Tua khi đang pause giữ nguyên pause và cập nhật vị trí cho người vào sau. Migration: `20261120040000_theater_host_seek.sql`.
+
+### Streak theo thời gian tập trung trong ngày
+
+Tích lũy đủ 30 phút tập trung trong cùng ngày để nhận tối đa một ngày streak. Tất cả chế độ timer, kể cả Stopwatch và nhiều phiên ngắn, cùng đóng góp. Giờ nghỉ và thời gian pause không tính. Sau khi mất chuỗi, đủ 30 phút bắt đầu lại từ 1 ngày; vật phẩm đóng băng vẫn theo quy tắc cũ. Khi tải local hoặc áp dụng cloud save, hệ thống kiểm tra lại thời gian đã ghi cho hôm nay để khôi phục ngày chưa được cộng, không cộng trùng hay dùng thời gian của hôm qua.
+
+Kiểm thử: `node assets/tests/streak-restart.cjs`.

@@ -8,6 +8,7 @@
 // ==========================================
 
 const STORAGE_KEY = 'STUDY_RPG_DATA_v1';
+const DAILY_STREAK_FOCUS_SECONDS = 30 * 60;
 
 // Ranks definition based on level thresholds
 const RANKS = [
@@ -340,6 +341,7 @@ function loadGameState() {
     state = JSON.parse(JSON.stringify(DEFAULT_STATE));
   }
   ensureDailyQuests();
+  awardStreakForDailyFocus();
   saveGameState();
 }
 
@@ -390,18 +392,18 @@ function checkDailyStreak() {
   } else {
     state.streak = 0;
     state.streakProtectedThrough = null;
-    addLog(`💔 Bỏ lỡ ${missedDays} ngày, không đủ viên đóng băng. Chuỗi về 0; giữ lại ${state.streakFreezes} viên. Hoàn thành phiên ≥30 phút để bắt đầu lại.`);
+    addLog(`💔 Bỏ lỡ ${missedDays} ngày, không đủ viên đóng băng. Chuỗi về 0; giữ lại ${state.streakFreezes} viên. Tích lũy đủ 30 phút tập trung trong ngày để bắt đầu lại.`);
   }
   saveGameState();
   return true;
 }
 
-// Hàm này được gọi từ onTimerCompleted khi đủ điều kiện (≥30 phút)
+// Award at most one earned day after the daily focus threshold has been reached.
 function earnDailyStreak() {
   checkDailyStreak();
   const today = getQuestDay();
   // Đã tích streak hôm nay rồi thì không tích nữa
-  if (state.streakEarnedToday === today) return;
+  if (state.streak > 0 && state.streakEarnedToday === today) return;
 
   const todayNumber = streakDayNumber(today);
   const actualEarned = streakDayNumber(state.streakEarnedToday) ?? streakDayNumber(state.lastActiveDate);
@@ -420,6 +422,16 @@ function earnDailyStreak() {
   state.streakProtectedThrough = null;
   saveGameState();
   renderHUD();
+}
+
+function awardStreakForDailyFocus() {
+  const today = getQuestDay();
+  const focus = state.dailyFocus;
+  if (focus?.date !== today || !Number.isFinite(focus.focusSeconds) || focus.focusSeconds < DAILY_STREAK_FOCUS_SECONDS) return false;
+  if (state.streak > 0 && state.streakEarnedToday === today) return false;
+  const previousStreak = state.streak;
+  earnDailyStreak();
+  return state.streak !== previousStreak;
 }
 
 function checkBuffExpiration() {
@@ -667,6 +679,7 @@ function tickTimer() {
   state.dailyFocus.focusSeconds += 1;
   if (currentTimerMode === 'STOPWATCH') state.dailyFocus.stopwatchSeconds += 1;
   if (newDay) { checkDailyStreak(); renderQuests(); }
+  awardStreakForDailyFocus();
   secondsAccumulator++;
 
   // Every 60 seconds of focused study gives +10 EXP and +2 Gold
@@ -722,11 +735,11 @@ function onTimerCompleted() {
     addLog(`🏆 Hoàn thành trọn vẹn phiên ${mode.label} (+${awardedExp} EXP, +${awardedGold} Vàng)!`);
     triggerConfetti();
 
-    // Tích streak nếu phiên học >= 30 phút
-    if (mode.focusMinutes >= 30) {
-      earnDailyStreak();
-    } else {
-      addLog(`⏳ Phiên này chỉ ${mode.focusMinutes} phút — cần ≥30 phút để tích streak 🔥`);
+    // Focus from all timer modes counts toward the same daily streak goal.
+    awardStreakForDailyFocus();
+    if (state.dailyFocus.focusSeconds < DAILY_STREAK_FOCUS_SECONDS && state.streakEarnedToday !== getQuestDay()) {
+      const remaining = Math.ceil((DAILY_STREAK_FOCUS_SECONDS - state.dailyFocus.focusSeconds) / 60);
+      addLog(`⏳ Còn ${remaining} phút tập trung hôm nay để tích streak 🔥`);
     }
 
     // Switch to break
@@ -1223,7 +1236,7 @@ function renderStreakTree() {
   if (!garden) return;
   garden.dataset.stage = growth.stage.id;
   const today = getQuestDay();
-  const earnedToday = state.streakEarnedToday === today;
+  const earnedToday = state.streak > 0 && state.streakEarnedToday === today;
   const preserved = !earnedToday && state.streak > 0 && streakDayNumber(state.streakProtectedThrough) !== null && streakDayNumber(state.streakProtectedThrough) >= streakDayNumber(today) - 1;
   garden.dataset.protected = String(preserved);
   const text = {
@@ -1232,7 +1245,7 @@ function renderStreakTree() {
     'tree-next-label': growth.nextStage ? `Còn ${growth.remaining} ngày học để đạt ${growth.nextStage.name}` : 'Cây đã kết trái. Tiếp tục chăm sóc chuỗi học của bạn!',
     'tree-progress-label': `${growth.progress}%`,
     'tree-art-title': `Cây chuyên cần: ${growth.stage.name}, ${growth.days} ngày học liên tiếp`,
-    'tree-status': earnedToday ? 'Đã chăm cây hôm nay. Hẹn bạn vào ngày mai!' : 'Hoàn thành một phiên từ 30 phút để chăm cây và tăng chuỗi hôm nay.',
+    'tree-status': earnedToday ? 'Đã chăm cây hôm nay. Hẹn bạn vào ngày mai!' : 'Tích lũy đủ 30 phút tập trung trong ngày để chăm cây và tăng chuỗi.',
     'tree-freeze-note': preserved ? 'Đã giữ cây qua ngày bỏ lỡ. Học để cây tiếp tục lớn.' : 'Đóng băng giữ nguyên cây, không cộng ngày.',
     'tree-freeze-stock': String(state.streakFreezes || 0)
   };
@@ -1657,6 +1670,7 @@ window.addEventListener('DOMContentLoaded', () => {
       state.settings = { ...defaults.settings, ...(payload?.settings || {}) };
       ensureDailyQuests();
       checkDailyStreak();
+      awardStreakForDailyFocus();
       checkBuffExpiration();
       saveGameState();
       renderHUD(); renderQuests(); renderShop(); renderRankMilestones();

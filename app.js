@@ -1566,6 +1566,11 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+function openCommunity(tabId) {
+  switchTab(tabId);
+  document.getElementById(tabId)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+}
+
 // Tab Switching
 function switchTab(tabId) {
   const tabs = ['tab-timer', 'tab-quests', 'tab-ranks', 'tab-shop', 'tab-logs', 'tab-leaderboard', 'tab-theater'];
@@ -1583,6 +1588,11 @@ function switchTab(tabId) {
     } else {
       btn.className = 'nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80';
     }
+  });
+
+  document.querySelectorAll('.community-link').forEach(button => {
+    if (button.dataset.tab === tabId) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
   });
 
   if (tabId === 'tab-quests') renderQuests();

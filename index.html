@@ -137,6 +137,7 @@
        MAIN CONTAINER
        =================================================== -->
   <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full flex-1">
+    <section id="community-hub" class="community-hub" aria-labelledby="community-heading"><div class="community-heading"><div><p>CÙNG NHAU TIẾN BỘ</p><h2 id="community-heading">Cộng đồng</h2></div><span>Một chỗ học, nhiều người đồng hành</span></div><div class="community-grid"><button type="button" class="community-link community-theater" data-tab="tab-theater" onclick="openCommunity('tab-theater')"><span class="community-icon" aria-hidden="true">🎬</span><span class="community-copy"><strong>Theater</strong><span>Ngồi học, trò chuyện và xem chung.</span><small>Vào phòng học chung ↗</small></span></button><button type="button" class="community-link community-ranking" data-tab="tab-leaderboard" onclick="openCommunity('tab-leaderboard')"><span class="community-icon" aria-hidden="true">🏆</span><span class="community-copy"><strong>Leaderboard</strong><span>Cùng đua thời gian tập trung mỗi ngày.</span><small>Khám phá bảng xếp hạng ↗</small></span></button></div></section>
     
     <!-- ===============================================
          HERO CHARACTER HUD (PLAYER PROFILE & PROGRESSION)
@@ -372,6 +373,7 @@
     <!-- ===============================================
          NAVIGATION TABS
          =============================================== -->
+    <p class="personal-nav-label">GÓC HỌC TẬP CỦA BẠN</p>
     <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800/80">
       <button onclick="switchTab('tab-timer')" data-tab="tab-timer" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
         <span>⏱️</span> Cày Cấp (Focus)
@@ -388,8 +390,8 @@
       <button onclick="switchTab('tab-logs')" data-tab="tab-logs" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/80">
         <span>📊</span> Lịch Sử & Thống Kê
       </button>
-    <button type="button" onclick="switchTab('tab-leaderboard')" data-tab="tab-leaderboard" class="nav-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-400">🏆 Leaderboard</button>
-    <button type="button" onclick="switchTab('tab-theater')" data-tab="tab-theater" class="nav-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white">🎬 Theater</button>
+    
+    
     </div>
 
     <!-- ===============================================
